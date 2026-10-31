@@ -1,0 +1,400 @@
+LEGACY ARCHIVE (READ-ONLY REFERENCE)
+Captured from prior session on 2026-10-31.
+Do not execute in the live repository.
+
+cat > setup_bih.sh <<'SCRIPT'
+#!/data/data/com.termux/files/usr/bin/bash
+set -e
+
+echo "Creating B.I.H scaffold..."
+
+mkdir -p docs services/api/app apps/cli apps/android libs/core
+
+cat > README.md <<'EOF'
+# B.I.H. — Brain Injury Helper
+
+Privacy-first voice + text assistant for daily support, built for people with brain injuries.
+
+## Vision
+B.I.H. is a personal AI assistant designed to reduce cognitive load and help with day-to-day life:
+- reminders (medication, appointments, tasks)
+- routines broken into simple steps
+- memory support (voice/text notes + recall)
+- paperwork/disability-form guidance
+- calm, short, non-judgmental interactions
+
+> **Important:** B.I.H. is not a medical provider and does not replace professional care.
+
+---
+
+## MVP Scope (Android + CLI, single user)
+
+### Included in MVP
+1. **Chat (text first, then voice)**
+2. **Memory journal** (capture and search notes)
+3. **Reminders** (local notifications)
+4. **Routines** (checklist style)
+5. **Paperwork helper** (guided prompts + export drafts)
+6. **Safety mode** (emergency contacts and escalation text)
+7. **Provider abstraction** (cloud LLM + local LLM option)
+
+### Deferred (post-MVP)
+- Cross-device desktop/laptop app integrations
+- Deep app control across all phone/laptop apps
+- Wearables integration
+- Advanced multimodal OCR ingestion
+
+---
+
+## Tech Stack
+
+### Why this stack
+- **Python FastAPI backend**: easy to learn, fast to iterate, great ecosystem
+- **Android app in Kotlin (Jetpack Compose)**: best native Android experience
+- **Python CLI**: simple local interface for quick testing and backup access
+- **SQLite + SQLCipher-ready design**: local-first, encrypted-at-rest path
+
+### Components
+- `apps/android`: Android mobile app (primary interface)
+- `apps/cli`: command-line client
+- `services/api`: FastAPI server
+- `libs/core`: shared domain logic (Python package)
+- `docs`: architecture, privacy model, roadmap
+
+---
+
+## Privacy & Security Principles
+
+1. **Local-first by default** for personal data
+2. **Least privilege permissions** (only request Android permissions when needed)
+3. **Encrypted storage** for sensitive content
+4. **Explicit consent** before enabling cloud LLMs
+5. **No background data sharing by default**
+6. **Clear user controls**: export, delete, and wipe data
+
+See `docs/PRIVACY_AND_SAFETY.md` for details.
+
+---
+
+## Getting Started (Developer)
+
+### Prerequisites
+- Python 3.11+
+- Android Studio (latest stable)
+- Java 17+
+
+### Run API locally
+```bash
+cd services/api
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+### Run CLI locally
+```bash
+cd apps/cli
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
+
+Android app scaffold is included in `apps/android/` with setup notes in `apps/android/README.md`.
+
+---
+
+## Roadmap
+
+- **Phase 0**: Foundation + threat model + consent flows
+- **Phase 1**: Text chat + journal + reminders + routines
+- **Phase 2**: Voice input/output + accessibility tuning
+- **Phase 3**: Paperwork assistant + secure export
+- **Phase 4**: Local model support + advanced integrations
+
+Full details: `docs/IMPLEMENTATION_PLAN.md`.
+
+---
+
+## Repo Structure
+
+```text
+.
+├── apps/
+│   ├── android/
+│   └── cli/
+├── services/
+│   └── api/
+├── libs/
+│   └── core/
+└── docs/
+```
+
+---
+
+## License
+To be decided by owner.
+EOF
+
+cat > docs/IMPLEMENTATION_PLAN.md <<'EOF'
+# Implementation Plan — B.I.H. (Brain Injury Helper)
+
+## 1) Product Goal
+Create a private-first AI assistant for a single Android user that helps with memory, routines, reminders, and paperwork support through text and voice.
+
+## 2) User Profile (Initial)
+- Single user (you)
+- Android phone primary device
+- May have reduced short-term memory, attention, planning bandwidth
+
+## 3) Design Principles
+- **Low cognitive load:** short responses, one action at a time
+- **Reliability over novelty:** predictable flows, explicit confirmations
+- **Safety-first UX:** escalation actions and emergency shortcut
+- **Privacy by default:** local storage and clear consent for cloud calls
+
+## 4) Feature Plan
+
+### Phase 0 — Foundation (Week 1)
+- [ ] Repo scaffolding
+- [ ] API skeleton + health checks
+- [ ] SQLite schema (notes, tasks, reminders, routines, contacts)
+- [ ] Configuration system for provider keys
+- [ ] Privacy/safety policy draft
+
+### Phase 1 — Core Assistant (Weeks 2–3)
+- [ ] Text chat endpoint
+- [ ] Conversation memory windowing
+- [ ] Journal capture (`save note`, `find note`)
+- [ ] Task/reminder CRUD
+- [ ] Routine templates + checklist state
+
+### Phase 2 — Android MVP UI (Weeks 3–5)
+- [ ] Compose screens: Chat, Today, Routines, Notes, Settings
+- [ ] Reminder notifications
+- [ ] Local persistence + sync with API
+- [ ] Accessibility pass (font sizes, contrast, spacing)
+
+### Phase 3 — Voice + Paperwork (Weeks 5–7)
+- [ ] Speech-to-text and text-to-speech
+- [ ] Voice command intents ("remind me", "note that")
+- [ ] Paperwork wizard (step-by-step fields)
+- [ ] Export draft to PDF/text
+
+### Phase 4 — Hardening & Privacy (Weeks 7–8)
+- [ ] Encryption at rest
+- [ ] Secret handling audit
+- [ ] Data export/delete flows
+- [ ] Incident logging (local)
+
+## 5) Architecture
+
+### High level
+- Android app communicates with FastAPI over HTTPS (local LAN during dev, secure endpoint later)
+- CLI can access same API for testing and backup usage
+- LLM provider interface supports:
+  - cloud provider (strict privacy mode)
+  - local provider (Ollama)
+
+### Service modules
+- `chat_service`
+- `memory_service`
+- `reminder_service`
+- `routine_service`
+- `paperwork_service`
+- `safety_service`
+
+## 6) Data Model (Initial)
+- `users` (single-user now, extensible)
+- `notes`
+- `tasks`
+- `reminders`
+- `routines`
+- `routine_steps`
+- `contacts` (for emergency escalation)
+- `conversations`
+- `messages`
+
+## 7) Safety Guardrails
+- Not a replacement for clinicians
+- If user expresses imminent danger/self-harm:
+  - immediate crisis guidance
+  - offer calling emergency contact/services
+- Medical/legal outputs framed as guidance, not professional advice
+
+## 8) Accessibility Requirements
+- large-touch controls
+- clear confirmation dialogs
+- plain-language prompts
+- optional repeated instructions
+- reduced animation mode
+
+## 9) Definition of Done (MVP)
+- User can:
+  1. chat by text
+  2. save and retrieve notes
+  3. set reminders and receive notifications
+  4. follow daily routine checklists
+  5. use voice input/output
+  6. complete a paperwork flow and export draft
+
+## 10) Risks + Mitigations
+- **Overreach of permissions:** request permissions just-in-time
+- **Cloud privacy concerns:** local-only mode + transparent toggles
+- **Voice recognition errors:** confirmation prompts before saving critical actions
+- **Reliability:** retry queue and offline-first caching
+EOF
+
+cat > docs/PRIVACY_AND_SAFETY.md <<'EOF'
+# Privacy and Safety Model
+
+## Core Principles
+1. Data minimization
+2. Explicit consent
+3. Local-first storage
+4. Encryption in transit and at rest
+5. User control over data lifecycle
+
+## Threat Model (Initial)
+- Device theft or unauthorized local access
+- API key leakage
+- Over-permissioned mobile app
+- Prompt injection from web content
+
+## Controls
+- Biometric/app lock (Android)
+- Token/key storage in encrypted keystore
+- Domain allowlist for web lookup tools
+- Output filtering for legal/medical overconfidence
+- Per-feature permission prompts
+
+## LLM Provider Strategy
+- Default: cloud provider with strict privacy commitments
+- Optional: local model runtime (no cloud transmission)
+- User sees and approves provider mode in Settings
+
+## Safety Boundaries
+- Not emergency service
+- Not a clinician/lawyer
+- Provides supportive guidance and checklists
+- Escalates to emergency actions when risk is detected
+
+## Data Lifecycle
+- Export all data (JSON + text)
+- Delete selected records
+- Full local wipe
+EOF
+
+cat > services/api/requirements.txt <<'EOF'
+fastapi==0.115.5
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+python-dotenv==1.0.1
+httpx==0.27.2
+sqlalchemy==2.0.36
+EOF
+
+cat > services/api/app/main.py <<'EOF'
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Literal
+
+app = FastAPI(title="BIH API", version="0.1.0")
+
+
+class ChatRequest(BaseModel):
+    message: str
+    mode: Literal["supportive", "concise"] = "supportive"
+
+
+class ChatResponse(BaseModel):
+    reply: str
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat(req: ChatRequest):
+    # Placeholder response; real provider wiring in next step.
+    prefix = "I hear you. " if req.mode == "supportive" else ""
+    return ChatResponse(reply=f"{prefix}You said: {req.message}")
+EOF
+
+cat > apps/cli/requirements.txt <<'EOF'
+httpx==0.27.2
+EOF
+
+cat > apps/cli/main.py <<'EOF'
+import httpx
+
+API_URL = "http://127.0.0.1:8000"
+
+
+def main():
+    print("B.I.H CLI (type 'exit' to quit)")
+    while True:
+        msg = input("You: ").strip()
+        if msg.lower() in {"exit", "quit"}:
+            print("Take care. Goodbye.")
+            break
+        try:
+            r = httpx.post(f"{API_URL}/chat", json={"message": msg, "mode": "supportive"}, timeout=20)
+            r.raise_for_status()
+            print("B.I.H:", r.json().get("reply", ""))
+        except Exception as e:
+            print("Error:", e)
+
+
+if __name__ == "__main__":
+    main()
+EOF
+
+cat > apps/android/README.md <<'EOF'
+# Android App (Kotlin + Jetpack Compose)
+
+This folder is reserved for the Android app.
+
+## Planned setup
+- Kotlin + Jetpack Compose
+- Min SDK: 26+
+- Modules:
+  - `app`: UI + navigation
+  - `data`: local db + repositories
+  - `voice`: speech-to-text/text-to-speech wrappers
+  - `network`: API client for BIH backend
+
+## Initial screens
+- Chat
+- Today (tasks + reminders)
+- Routines
+- Notes
+- Settings (privacy + provider mode)
+
+## Next implementation step
+Scaffold Android Studio project and wire basic chat screen to `/chat` endpoint.
+EOF
+
+cat > libs/core/pyproject.toml <<'EOF'
+[project]
+name = "bih-core"
+version = "0.1.0"
+description = "Shared domain logic for Brain Injury Helper"
+requires-python = ">=3.11"
+
+[tool.black]
+line-length = 100
+EOF
+
+echo "Scaffold complete."
+echo "Next:"
+echo "  git add ."
+echo "  git commit -m \"Initialize implementation plan and MVP scaffolding for B.I.H.\""
+echo "  git push origin main"
+SCRIPT
+
+chmod +x setup_bih.sh
+./setup_bih.sh
