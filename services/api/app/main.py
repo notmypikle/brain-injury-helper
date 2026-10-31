@@ -1,7 +1,10 @@
+import json
+import os
 from typing import List
 
+import httpx
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ValidationError
 
 from .db import get_conn, init_db
 
@@ -20,11 +23,69 @@ class ReminderIn(BaseModel):
 
 class RoutineIn(BaseModel):
     name: str
-    steps: List[str] = []
+    steps: List[str] = Field(default_factory=list)
+
+
+class PaperworkRequest(BaseModel):
+    text: str
+
+
+class PaperworkResponse(BaseModel):
+    plain_summary: str
+    key_actions: List[str]
+    deadlines: List[str]
+    questions_to_ask: List[str]
+    safety_note: str
+
+
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 
 
 def rows(cursor):
     return [dict(r) for r in cursor.fetchall()]
+
+
+def _require_openai_key() -> str:
+    key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not key:
+        raise HTTPException(
+            status_code=503,
+            detail="OPENAI_API_KEY is not set on the server.",
+        )
+    return key
+
+
+def _openai_chat(messages: List[dict], *, json_mode: bool = False) -> str:
+    key = _require_openai_key()
+    body = {"model": OPENAI_MODEL, "messages": messages, "temperature": 0.2}
+    if json_mode:
+        body["response_format"] = {"type": "json_object"}
+
+    headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    try:
+        with httpx.Client(timeout=45.0) as client:
+            resp = client.post(OPENAI_URL, headers=headers, json=body)
+            resp.raise_for_status()
+    except httpx.TimeoutException as exc:
+        raise HTTPException(status_code=504, detail="OpenAI request timed out.") from exc
+    except httpx.HTTPStatusError as exc:
+        detail = "OpenAI request failed."
+        if exc.response.status_code in (401, 403):
+            detail = "OpenAI authentication failed. Check OPENAI_API_KEY."
+        raise HTTPException(status_code=502, detail=detail) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="OpenAI connection failed.") from exc
+
+    data = resp.json()
+    choices = data.get("choices", [])
+    if not choices:
+        raise HTTPException(status_code=502, detail="OpenAI returned no choices.")
+
+    content = choices[0].get("message", {}).get("content", "").strip()
+    if not content:
+        raise HTTPException(status_code=502, detail="OpenAI returned empty content.")
+    return content
 
 
 @app.post("/notes", status_code=201)
@@ -119,5 +180,58 @@ def health():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    # Placeholder until an LLM provider is wired in.
-    return ChatResponse(reply=f"I hear you. You said: {req.message}")
+    if not req.message.strip():
+        raise HTTPException(400, "Message is required")
+
+    system_prompt = (
+        "You are B.I.H., a calm assistant for people with brain injuries. "
+        "Use plain language, short steps, and gentle tone. "
+        "Do not claim legal or medical authority. Keep replies concise."
+    )
+    reply = _openai_chat(
+        [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": req.message},
+        ]
+    )
+    return ChatResponse(reply=reply)
+
+
+@app.post("/paperwork/analyze", response_model=PaperworkResponse)
+def analyze_paperwork(req: PaperworkRequest):
+    if not req.text.strip():
+        raise HTTPException(400, "Paperwork text is required")
+
+    system_prompt = (
+        "You are B.I.H. Paperwork Helper. Return JSON only with keys: "
+        "plain_summary (string), key_actions (array of short strings), "
+        "deadlines (array of short strings), questions_to_ask (array of short strings), "
+        "safety_note (string). "
+        "Use plain language for cognitive accessibility. Keep each item short. "
+        "If a field is unknown, return a safe, explicit message in that field."
+    )
+    raw = _openai_chat(
+        [
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": (
+                    "Analyze this paperwork text and extract what matters:\n\n"
+                    f"{req.text}"
+                ),
+            },
+        ],
+        json_mode=True,
+    )
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=502, detail="OpenAI returned invalid JSON.") from exc
+
+    try:
+        return PaperworkResponse(**parsed)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="OpenAI response JSON was missing required fields.",
+        ) from exc

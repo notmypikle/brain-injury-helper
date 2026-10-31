@@ -150,3 +150,8 @@ vite.config.ts.timestamp-*
 
 # B.I.H. private data
 *.db
+
+# Android local/build files
+**/.gradle/
+**/build/
+local.properties
