@@ -34,11 +34,28 @@ python main.py
 Set `BIH_API_URL` to point the CLI at a different API address.
 
 ## API endpoints
-- `GET /health` — liveness check
+- `GET /health` — liveness check (always open)
 - `POST /chat` — chat reply; detects possible crisis language and responds
   with crisis guidance plus a `safety_flag` (see `docs/PRIVACY_AND_SAFETY.md`)
-- `POST /notes` / `GET /notes` / `DELETE /notes/{id}` — memory journal,
-  stored locally in SQLite (`bih.db` by default; override with `BIH_DB_PATH`)
+- `POST /voice` — single round-trip for voice clients: transcript in,
+  reply text out (device handles speech-to-text and text-to-speech
+  on-device; see `docs/VOICE_AND_PRODUCTION.md`)
+- `POST /notes` / `GET /notes` / `DELETE /notes/{id}` — memory journal
+- `POST /reminders` / `GET /reminders` / `POST /reminders/{id}/done` /
+  `DELETE /reminders/{id}` — reminders with due times
+- `POST /routines` / `GET /routines` / `DELETE /routines/{id}` — step-by-step
+  routine checklists
+
+All data is stored locally in SQLite (`bih.db` by default; override with
+`BIH_DB_PATH`). Set `BIH_API_KEY` to require an `X-API-Key` header on every
+endpoint except `/health`.
+
+## Docs
+- `docs/VOICE_AND_PRODUCTION.md` — voice architecture + concept→production roadmap
+- `docs/MONETIZATION.md` — ethical pricing tiers and revenue plan
+- `docs/RISK_AND_ISSUE_MAP.md` — every known/theoretical issue + resolutions
+- `docs/RISK_MAP_TEMPLATE.md` — reusable risk template for other projects
+- `docs/IMPLEMENTATION_PLAN.md`, `docs/PRIVACY_AND_SAFETY.md`
 
 ## Run the tests
 ```bash
