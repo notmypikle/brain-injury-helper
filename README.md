@@ -31,4 +31,20 @@ pip install -r requirements.txt
 python main.py
 ```
 
+Set `BIH_API_URL` to point the CLI at a different API address.
+
+## API endpoints
+- `GET /health` — liveness check
+- `POST /chat` — chat reply; detects possible crisis language and responds
+  with crisis guidance plus a `safety_flag` (see `docs/PRIVACY_AND_SAFETY.md`)
+- `POST /notes` / `GET /notes` / `DELETE /notes/{id}` — memory journal,
+  stored locally in SQLite (`bih.db` by default; override with `BIH_DB_PATH`)
+
+## Run the tests
+```bash
+cd services/api
+pip install -r requirements-dev.txt
+pytest
+```
+
 See `docs/IMPLEMENTATION_PLAN.md` and `docs/PRIVACY_AND_SAFETY.md`.
