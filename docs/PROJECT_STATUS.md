@@ -11,7 +11,7 @@ Last updated: 2026-11-02
 |---|---|---|
 | Phase 0 — scaffolding, health check, SQLite, privacy doc | ✅ Done | |
 | Phase 1 — chat, notes, reminders, routines | ✅ Done | 12 tests passing |
-| Phase 2 — Android app | 🔨 In progress | Scaffolded; screens wired to API (see below) |
+| Phase 2 — Android app | ✅ Coded | All screens, voice, notifications, autofill; pending first build + on-device test |
 | Phase 3 — voice, paperwork, export | 🔶 Mostly done | Voice (mic + TTS on Chat), paperwork wizard + export all built; needs on-device testing |
 | Phase 4 — encryption at rest, export/delete, local LLM | 📋 Planned | Launch gates, see VOICE_AND_PRODUCTION.md |
 
@@ -42,15 +42,20 @@ Last updated: 2026-11-02
   Android Studio / Android SDK, which this environment doesn't have).
   First build may need small fixes — treat that as expected, not a failure.
 
+- **Reminder notifications:** the Today screen can now create reminders,
+  and each one schedules a local notification at its due time
+  (WorkManager; notification permission requested on Android 13+).
+  Marking a reminder done cancels its notification.
+
 ## Where we left off / next steps (in order)
 1. **Open `apps/android` in Android Studio and build it.** Fix any
-   first-build errors (risk I6 in RISK_AND_ISSUE_MAP.md).
+   first-build errors (risk I6 in RISK_AND_ISSUE_MAP.md). Phase 2 is now
+   fully coded — this build check is the gate.
 2. **Enable and test the new autofill service on a real device/emulator:**
    Settings → System → Autofill service → choose B.I.H. Then open an
    online form and check the confirmation screen appears (risk S11).
    Save My details in the Forms tab first — autofill reads that cache.
-3. Local notifications for reminders (Android `WorkManager`/`AlarmManager`).
-4. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
+3. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
 
 ## Session checklist (do this every session)
 1. Read this file first.
