@@ -49,6 +49,10 @@ Last updated: 2026-11-02
 - **Data rights (launch gate, risks S8/O1):** `GET /export` downloads all
   data as one JSON file; `DELETE /data` wipes everything. WAL mode
   enabled for crash safety (O2 ✅). 25 tests passing.
+- **On-device encryption (S4 ✅):** the Android API key and cached profile
+  are now encrypted with the Android Keystore (hardware-backed
+  AES-256-GCM). S3 partially mitigated via Android full-disk encryption;
+  SQLCipher remains the Phase 4 belt-and-braces step.
 
 ## Where we left off / next steps (in order)
 1. **Open `apps/android` in Android Studio and build it.** Fix any
