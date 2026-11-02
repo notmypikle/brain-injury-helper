@@ -12,13 +12,21 @@ Last updated: 2026-11-02
 | Phase 0 — scaffolding, health check, SQLite, privacy doc | ✅ Done | |
 | Phase 1 — chat, notes, reminders, routines | ✅ Done | 12 tests passing |
 | Phase 2 — Android app | 🔨 In progress | Scaffolded; screens wired to API (see below) |
-| Phase 3 — voice, paperwork, export | 🔶 Partial | `/voice` endpoint done; paperwork wizard + export not started |
+| Phase 3 — voice, paperwork, export | 🔶 Partial | `/voice` endpoint done; paperwork wizard + text export done (API + Android Forms tab); Android voice UI not started |
 | Phase 4 — encryption at rest, export/delete, local LLM | 📋 Planned | Launch gates, see VOICE_AND_PRODUCTION.md |
 
 ## What was done this session
 - Created this status file.
 - Scaffolded `apps/android`: Kotlin + Jetpack Compose project with Chat,
   Today, Notes, Routines, and Settings screens, plus an API client.
+- **Paperwork wizard** (for forms that can only be filed online):
+  - API: `/profile` (personal details stored once), `/paperwork/templates`
+    (doctor visit, medication list, benefits/disability answers, emergency
+    card), `/paperwork/fill` (auto-fills from profile, reports missing
+    fields), document list/get/delete, and plain-text export.
+  - Android: new **Forms** tab — My details editor, form picker, one-field-
+    at-a-time fill with profile pre-fill, copy-friendly document view.
+  - 21 API tests passing (9 new for paperwork).
 - **Not yet verified:** the Android project has not been built (needs
   Android Studio / Android SDK, which this environment doesn't have).
   First build may need small fixes — treat that as expected, not a failure.
@@ -26,11 +34,14 @@ Last updated: 2026-11-02
 ## Where we left off / next steps (in order)
 1. **Open `apps/android` in Android Studio and build it.** Fix any
    first-build errors (risk I6 in RISK_AND_ISSUE_MAP.md).
-2. Add the mic button + TextToSpeech reply on the Chat screen
+2. **Online auto-fill, part 2** (user-requested): an Android Autofill
+   service / copy-helper that pushes wizard answers directly into web
+   forms, so online-only paperwork is filled without manual copying.
+3. Add the mic button + TextToSpeech reply on the Chat screen
    (voice per VOICE_AND_PRODUCTION.md Part 1).
-3. Local notifications for reminders (Android `WorkManager`/`AlarmManager`).
-4. Reminder timezone validation (risk P2) — Android sends local time + offset.
-5. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
+4. Local notifications for reminders (Android `WorkManager`/`AlarmManager`).
+5. Reminder timezone validation (risk P2) — Android sends local time + offset.
+6. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
 
 ## Session checklist (do this every session)
 1. Read this file first.

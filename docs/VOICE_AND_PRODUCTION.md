@@ -30,8 +30,9 @@ User hears reply ← Android TextToSpeech ← {reply_text}
 ### ✅ Done (concept → working foundation)
 - [x] Product concept, privacy model, implementation plan
 - [x] FastAPI backend: chat with crisis detection, notes, reminders, routines, voice endpoint
+- [x] Paperwork wizard: profile auto-fill, form templates, finished-document storage, text export (for forms that can only be filed online)
 - [x] Local-first SQLite storage, optional API-key protection
-- [x] Test suite (12 tests), pinned dependencies
+- [x] Test suite (21 tests), pinned dependencies
 - [x] Risk & issue map, monetization plan
 
 ### 🔨 Next up — Phase 2: Android app (the big one)

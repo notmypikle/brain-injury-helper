@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.List
@@ -32,6 +33,7 @@ private val tabs = listOf(
     Tab("today", "Today", Icons.Filled.CheckCircle),
     Tab("notes", "Notes", Icons.Filled.Edit),
     Tab("routines", "Routines", Icons.Filled.List),
+    Tab("forms", "Forms", Icons.Filled.Description),
     Tab("settings", "Settings", Icons.Filled.Settings),
 )
 
@@ -79,6 +81,7 @@ fun AppNav(api: ApiClient, settings: SettingsStore) {
             composable("today") { TodayScreen(api) }
             composable("notes") { NotesScreen(api) }
             composable("routines") { RoutinesScreen(api) }
+            composable("forms") { FormsScreen(api) }
             composable("settings") { SettingsScreen(settings) }
         }
     }
