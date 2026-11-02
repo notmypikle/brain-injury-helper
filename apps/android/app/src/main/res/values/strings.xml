@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">B.I.H.</string>
+    <string name="autofill_service_description">Fills web forms with the details you saved in B.I.H. Nothing is filled without your confirmation.</string>
+    <string name="autofill_banner">Fill with B.I.H. — tap to review</string>
 </resources>
