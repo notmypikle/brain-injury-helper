@@ -58,6 +58,8 @@ def connect(path: Path | None = None) -> sqlite3.Connection:
     """Open a connection and make sure the schema exists."""
     conn = sqlite3.connect(path or db_path())
     conn.row_factory = sqlite3.Row
+    # WAL mode: extra crash safety if power is lost mid-write (risk O2).
+    conn.execute("PRAGMA journal_mode=WAL")
     conn.executescript(SCHEMA)
     return conn
 
@@ -243,3 +245,21 @@ def _document_dict(row: sqlite3.Row) -> dict:
     d = dict(row)
     d["missing"] = json.loads(d["missing"])
     return d
+
+
+# --- Export / wipe (privacy rights: your data, portable and deletable) -----
+
+def export_all(conn: sqlite3.Connection) -> dict:
+    return {
+        "notes": list_notes(conn),
+        "reminders": list_reminders(conn, include_done=True),
+        "routines": list_routines(conn),
+        "profile": get_profile(conn),
+        "documents": list_documents(conn),
+    }
+
+
+def wipe_all(conn: sqlite3.Connection) -> None:
+    for table in ("notes", "reminders", "routines", "profile", "documents"):
+        conn.execute(f"DELETE FROM {table}")
+    conn.commit()

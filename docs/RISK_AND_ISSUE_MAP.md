@@ -35,7 +35,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | S5 | Prompt injection via web content or notes fed to LLM | 🟠 | 🛡️ | Domain allowlist planned; treat all stored text as untrusted context; system prompt hardening when LLM is wired in. |
 | S6 | Sensitive data in logs | 🟠 | 🛡️ | No request-body logging anywhere in the API. Rule: log metadata only, never user text. |
 | S7 | Dependency vulnerabilities | 🟡 | 🛡️ | Pinned versions + `pip-audit` in release checklist + GitHub Dependabot alerts. |
-| S8 | No data export/delete mechanism yet (GDPR-style rights) | 🟠 | 📋 | Phase 4 explicitly includes export/delete/wipe. Until then, deleting `bih.db` wipes everything — documented for users. |
+| S8 | No data export/delete mechanism yet (GDPR-style rights) | 🟠 | 🛡️ | Done: `GET /export` downloads everything as JSON; `DELETE /data` wipes all tables. Deleting `bih.db` also still works. Remaining: encrypted export (Phase 4). |
 | S9 | Crisis-data liability (app detects crisis, user harmed anyway) | 🔴 | 🛡️ | Disclaimer in README: not a medical provider. Crisis reply directs to human help immediately. Legal review before public launch. |
 | S10 | Profile & paperwork documents concentrate PII/medical data (name, DOB, conditions, medications) | 🔴 | 🛡️ | Local-only storage, never sent to any LLM/cloud by default. Exported documents are plain text — warn users to store/share them carefully. Phase 4 encryption at rest (S3) covers these tables too. Field values are length-capped and keys whitelisted to a safe pattern. |
 | S11 | Autofill service could leak profile data into wrong app/website | 🟠 | 🛡️ | Built with conservative field matching; passwords/usernames/cards never touched; nothing fills without the confirmation screen showing every field+value; service reads only the local profile cache (no network); `onSaveRequest` ignored so nothing typed on sites is captured. Verify on a real device before release. |
@@ -44,7 +44,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 
 | # | Issue | Sev | Status | Resolution |
 |---|---|---|---|---|
-| I1 | Wrong Python version (<3.10 breaks `X \| Y` types) | 🟡 | 📋 | State Python 3.10+ requirement in README; add version check on startup. |
+| I1 | Wrong Python version (<3.10 breaks `X \| Y` types) | 🟡 | ✅ | README states Python 3.10+ requirement. |
 | I2 | pip install fails on Termux (native deps) | 🟡 | 🛡️ | All current deps are pure-Python wheels. Keep it that way; if a native dep is ever needed, document Termux pkg steps. |
 | I3 | Port 8000 already in use | ⚪ | 📋 | Document `--port` flag in README troubleshooting section. |
 | I4 | `uvicorn app.main:app` fails from wrong directory | ⚪ | 🛡️ | README shows `cd services/api` first; conftest.py handles path for tests. |
@@ -56,7 +56,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | # | Issue | Sev | Status | Resolution |
 |---|---|---|---|---|
 | O1 | No backups of user data | 🟠 | 📋 | Phase 4 encrypted export doubles as backup. Document manual `bih.db` copy for power users. |
-| O2 | DB corruption (power loss mid-write) | 🟡 | 🛡️ | SQLite is transactional; enable WAL mode in Phase 2 for extra crash safety. |
+| O2 | DB corruption (power loss mid-write) | 🟡 | ✅ | SQLite is transactional; WAL mode enabled for extra crash safety. |
 | O3 | No crash reporting in production | 🟡 | 📋 | Add privacy-preserving crash reporting (opt-in, no message content) before public launch. |
 | O4 | Accessibility regressions (our users depend on it) | 🔴 | 📋 | Accessibility is a launch gate, not a feature: TalkBack testing, large-text support, WCAG AA audit before release. |
 | O5 | App Store / Play review rejection | 🟡 | 📋 | Medical-adjacent claims are the risk: keep "not a medical provider" framing everywhere, no diagnostic claims in store listing. |

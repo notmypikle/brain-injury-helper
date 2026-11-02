@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import secrets
@@ -361,3 +362,27 @@ def _document_response(doc: dict) -> PaperworkDocument:
         missing_fields=doc["missing"],
         created_at=doc["created_at"],
     )
+
+
+# --- Data rights (Phase 4 launch gate): export everything, delete everything ---
+
+@app.get("/export", dependencies=[Depends(require_api_key)])
+def export_all():
+    """Download every piece of stored data as one JSON file (backup / GDPR-style
+    portability, risks S8 + O1)."""
+    with closing(db.connect()) as conn:
+        data = db.export_all(conn)
+    return PlainTextResponse(
+        json.dumps(data, indent=2),
+        media_type="application/json",
+        headers={"Content-Disposition": 'attachment; filename="bih-export.json"'},
+    )
+
+
+@app.delete("/data", dependencies=[Depends(require_api_key)])
+def delete_all_data():
+    """Delete EVERYTHING: notes, reminders, routines, profile, documents.
+    There is no undo (risk S8)."""
+    with closing(db.connect()) as conn:
+        db.wipe_all(conn)
+    return {"deleted": True}

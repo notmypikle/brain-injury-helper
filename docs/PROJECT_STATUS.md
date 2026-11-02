@@ -13,7 +13,7 @@ Last updated: 2026-11-02
 | Phase 1 — chat, notes, reminders, routines | ✅ Done | 12 tests passing |
 | Phase 2 — Android app | ✅ Coded | All screens, voice, notifications, autofill; pending first build + on-device test |
 | Phase 3 — voice, paperwork, export | 🔶 Mostly done | Voice (mic + TTS on Chat), paperwork wizard + export all built; needs on-device testing |
-| Phase 4 — encryption at rest, export/delete, local LLM | 📋 Planned | Launch gates, see VOICE_AND_PRODUCTION.md |
+| Phase 4 — encryption at rest, export/delete, local LLM | 🔶 Partial | `GET /export` + `DELETE /data` done; encryption at rest + local LLM pending |
 
 ## What was done this session
 - Created this status file.
@@ -46,6 +46,9 @@ Last updated: 2026-11-02
   and each one schedules a local notification at its due time
   (WorkManager; notification permission requested on Android 13+).
   Marking a reminder done cancels its notification.
+- **Data rights (launch gate, risks S8/O1):** `GET /export` downloads all
+  data as one JSON file; `DELETE /data` wipes everything. WAL mode
+  enabled for crash safety (O2 ✅). 25 tests passing.
 
 ## Where we left off / next steps (in order)
 1. **Open `apps/android` in Android Studio and build it.** Fix any
