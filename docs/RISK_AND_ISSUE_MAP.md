@@ -23,6 +23,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | P8 | Breaking API changes during Android development | 🟡 | 🛡️ | Pydantic models version responses; API versioned (v0.3.0); add `/v1/` prefix before public release. |
 | P9 | LLM provider outage once wired in | 🟠 | 📋 | Graceful fallback: cached supportive responses + all local features (notes/reminders/routines) keep working without AI. |
 | P10 | Memory leak / unclosed DB connections | 🟡 | ✅ | All connections scoped via `closing()` context manager per request. |
+| P11 | Chat history lost when Android kills the app process | 🟡 | 🛡️ | ChatViewModel survives rotation/tab switches; surviving process death needs persisting the chat log locally — planned for Phase 2/3 alongside notes sync. |
 
 ## 2. SECURITY ISSUES
 

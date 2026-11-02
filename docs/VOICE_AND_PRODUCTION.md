@@ -34,14 +34,16 @@ User hears reply ← Android TextToSpeech ← {reply_text}
 - [x] Test suite (12 tests), pinned dependencies
 - [x] Risk & issue map, monetization plan
 
-### 🔨 Next up — Phase 2: Android app (the big one)
-- [ ] Scaffold Kotlin + Jetpack Compose project
-- [ ] Chat screen (text first) wired to `/chat`
-- [ ] Today screen: due reminders + routine checklists
-- [ ] Notes screen wired to `/notes`
-- [ ] Settings: API address, API key, app lock
-- [ ] Mic button + TTS reply (voice per Part 1)
+### 🔨 Phase 2: Android app (in progress)
+- [x] Scaffold Kotlin + Jetpack Compose project
+- [x] Chat screen (text first) wired to `/chat`
+- [x] Today screen: due reminders + routine checklists
+- [x] Notes screen wired to `/notes`
+- [x] Settings: API address, API key, voice toggle
+- [x] Mic button + TTS reply (voice per Part 1)
+- [ ] App lock (biometric/PIN)
 - [ ] Local notifications for reminders
+- [ ] First on-device build & test (needs Android Studio — see apps/android/README.md)
 
 ### 🚀 Phase 3: Beta
 - [ ] Closed beta via Play Console (10–20 real users from brain-injury communities)
