@@ -51,10 +51,15 @@ class BihAutofillService : AutofillService() {
         }
 
         val intent = FillConfirmationActivity.buildIntent(this, matches)
-        val sender = PendingIntent.getActivity(
+        val pending = PendingIntent.getActivity(
             this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        ).intentSender
+        )
+        val sender = pending?.intentSender
+        if (sender == null) {
+            callback.onSuccess(null)
+            return
+        }
 
         val presentation = RemoteViews(packageName, R.layout.autofill_banner)
         val response = FillResponse.Builder()
@@ -122,7 +127,9 @@ class BihAutofillService : AutofillService() {
         }
 
         val html = buildString {
-            node.htmlInfo?.attributes?.forEach { (k, v) -> append(k).append('=').append(v).append(';') }
+            node.htmlInfo?.attributes?.forEach { attr ->
+                append(attr.first).append('=').append(attr.second).append(';')
+            }
         }.lowercase(Locale.US)
         if (html.contains("type=password") || html.contains("type=hidden")) return null
 

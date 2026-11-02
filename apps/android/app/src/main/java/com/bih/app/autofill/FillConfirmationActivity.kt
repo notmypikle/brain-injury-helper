@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.service.autofill.Dataset
 import android.view.autofill.AutofillId
-import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -78,7 +77,8 @@ class FillConfirmationActivity : ComponentActivity() {
         }
         setResult(
             Activity.RESULT_OK,
-            Intent().putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT_DATASET, builder.build()),
+            // Hands the filled dataset back to the autofill framework.
+            Intent().putExtra(EXTRA_RESULT_DATASET, builder.build()),
         )
         finish()
     }
@@ -89,6 +89,9 @@ class FillConfirmationActivity : ComponentActivity() {
     }
 
     companion object {
+        // Same value as AutofillManager.EXTRA_AUTHENTICATION_RESULT_DATASET.
+        private const val EXTRA_RESULT_DATASET =
+            "android.view.autofill.extra.AUTHENTICATION_RESULT_DATASET"
         private const val EXTRA_IDS = "bih.extra.IDS"
         private const val EXTRA_LABELS = "bih.extra.LABELS"
         private const val EXTRA_VALUES = "bih.extra.VALUES"
