@@ -84,6 +84,21 @@ def test_reminders_roundtrip(client):
     assert client.delete("/reminders/9999").status_code == 404
 
 
+def test_reminder_accepts_iso_with_offset(client):
+    r = client.post(
+        "/reminders",
+        json={"text": "Call doctor", "due_at": "2026-11-02T09:00+00:00"},
+    )
+    assert r.status_code == 201
+    assert r.json()["due_at"] == "2026-11-02T09:00+00:00"
+
+
+def test_reminder_rejects_bad_due_at(client):
+    for bad in ["tomorrow morning", "11/02/2026 9am", "2026-13-40T99:99"]:
+        r = client.post("/reminders", json={"text": "Nope", "due_at": bad})
+        assert r.status_code == 422, bad
+
+
 def test_routines_roundtrip(client):
     r = client.post(
         "/routines",
