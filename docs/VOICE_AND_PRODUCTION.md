@@ -35,11 +35,11 @@ User hears reply ← Android TextToSpeech ← {reply_text}
 - [x] Risk & issue map, monetization plan
 
 ### 🔨 Next up — Phase 2: Android app (the big one)
-- [ ] Scaffold Kotlin + Jetpack Compose project
-- [ ] Chat screen (text first) wired to `/chat`
-- [ ] Today screen: due reminders + routine checklists
-- [ ] Notes screen wired to `/notes`
-- [ ] Settings: API address, API key, app lock
+- [x] Scaffold Kotlin + Jetpack Compose project (not yet build-verified — see docs/PROJECT_STATUS.md)
+- [x] Chat screen (text first) wired to `/chat`
+- [x] Today screen: due reminders + routine checklists
+- [x] Notes screen wired to `/notes`
+- [x] Settings: API address, API key (app lock still pending)
 - [ ] Mic button + TTS reply (voice per Part 1)
 - [ ] Local notifications for reminders
 
