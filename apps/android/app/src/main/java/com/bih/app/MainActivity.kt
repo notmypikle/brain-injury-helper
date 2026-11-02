@@ -1,8 +1,12 @@
 package com.bih.app
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -23,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.bih.app.data.ApiClient
 import com.bih.app.data.SettingsStore
+import com.bih.app.notifications.ReminderScheduler
 import com.bih.app.ui.screens.*
 import com.bih.app.ui.theme.BihTheme
 
@@ -40,6 +45,14 @@ private val tabs = listOf(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ReminderScheduler.ensureChannel(this)
+        // Android 13+ asks before an app may show notifications.
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
         val settings = SettingsStore(this)
         val api = ApiClient(settings)
         setContent {
