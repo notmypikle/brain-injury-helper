@@ -18,6 +18,7 @@ Privacy-first voice + text assistant for daily support, built for people with br
 - `docs`: plan and privacy model
 
 ## Run the API (Termux or computer)
+Requires **Python 3.10 or newer** (`python --version` to check).
 ```bash
 cd services/api
 pip install -r requirements.txt
@@ -54,6 +55,10 @@ Set `BIH_API_URL` to point the CLI at a different API address.
 - `GET /paperwork/documents` / `GET|DELETE /paperwork/documents/{id}` /
   `GET /paperwork/documents/{id}/export` — manage and download finished
   documents (plain-text export for copying into online forms)
+
+- `GET /export` — download ALL your data as one JSON file (backup / portability)
+- `DELETE /data` — permanently delete everything (notes, reminders, routines,
+  profile, documents). No undo.
 
 For forms that can only be filed online, the Android app also provides an
 **autofill service**: after saving your details in the Forms tab, enable
