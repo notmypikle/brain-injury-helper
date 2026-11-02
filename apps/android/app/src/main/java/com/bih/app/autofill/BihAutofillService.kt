@@ -70,7 +70,7 @@ class BihAutofillService : AutofillService() {
 
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
         // Never capture or store what the user types into other apps/sites.
-        callback.onSuccess(null)
+        callback.onSuccess()
     }
 
     private fun collect(
