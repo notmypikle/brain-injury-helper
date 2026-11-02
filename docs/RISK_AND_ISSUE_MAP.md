@@ -14,10 +14,10 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | # | Issue | Sev | Status | Resolution |
 |---|---|---|---|---|
 | P1 | SQLite write contention (two requests write at once) | 🟡 | 🛡️ | SQLite serializes writes; single-user app makes collisions rare. If we ever go multi-user, migrate to PostgreSQL. |
-| P2 | Reminder times stored without timezone | 🟠 | 📋 | Store ISO 8601 with explicit offset; Android app sends local time + offset. Add validation in Phase 2. |
+| P2 | Reminder times stored without timezone | 🟠 | 🛡️ | API validates ISO 8601 (422 on invalid). Offset preferred; naive values treated as user's local time. Android app should send local time + offset. |
 | P3 | Crisis regex false negatives (misspellings, other languages) | 🔴 | 🛡️ | Regex is a backstop only. Phase 3+ adds LLM-based detection layer. Never rely on regex alone; emergency button always visible in UI regardless. |
 | P4 | Crisis regex false positives (e.g. quoting a song lyric) | 🟡 | 🛡️ | Reply is caring but non-blocking — user can keep chatting. Acceptable tradeoff: over-trigger beats under-trigger. |
-| P5 | Speech recognition errors for users with speech impairments | 🔴 | 📋 | Core audience risk. On-device STT quality varies with impaired speech. Mitigate: always offer text input equally, slow confirmation loop, "did I get that right?" repeats. Test with real users early. |
+| P5 | Speech recognition errors for users with speech impairments | 🔴 | 🛡️ | Mitigations built: text input always equally available; mic transcript lands in the text box for review before sending (never auto-sent). Still needs testing with real users in Phase 3 beta. |
 | P6 | Dependency supply-chain break (package yanked/vulnerable) | 🟡 | ✅ | Versions pinned in requirements.txt. Re-run pip audit before releases; Dependabot on GitHub. |
 | P7 | Unbounded database growth (notes/reminders forever) | 🟡 | 📋 | Phase 4 export + user-controlled deletion already planned; add DB size to /health later. |
 | P8 | Breaking API changes during Android development | 🟡 | 🛡️ | Pydantic models version responses; API versioned (v0.3.0); add `/v1/` prefix before public release. |
