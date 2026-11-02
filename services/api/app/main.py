@@ -2,6 +2,7 @@ import os
 import re
 import secrets
 from contextlib import closing
+from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
@@ -124,9 +125,23 @@ def remove_note(note_id: int):
 
 # --- Reminders (Phase 1) ----------------------------------------------------
 
+def _validate_due_at(due_at: str) -> None:
+    """Risk P2: due_at must be ISO 8601. An explicit UTC offset
+    (e.g. "2026-11-02T09:00+00:00") is preferred; naive values are
+    accepted and treated as the user's local time."""
+    try:
+        datetime.fromisoformat(due_at)
+    except ValueError:
+        raise HTTPException(
+            status_code=422,
+            detail="due_at must be ISO 8601, e.g. 2026-11-02T09:00+00:00",
+        )
+
+
 @app.post("/reminders", response_model=Reminder, status_code=201,
           dependencies=[Depends(require_api_key)])
 def create_reminder(reminder: ReminderIn):
+    _validate_due_at(reminder.due_at)
     with closing(db.connect()) as conn:
         return db.add_reminder(conn, reminder.text, reminder.due_at)
 

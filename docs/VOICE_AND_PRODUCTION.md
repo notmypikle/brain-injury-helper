@@ -41,7 +41,7 @@ User hears reply ← Android TextToSpeech ← {reply_text}
 - [x] Today screen: due reminders + routine checklists
 - [x] Notes screen wired to `/notes`
 - [x] Settings: API address, API key (app lock still pending)
-- [ ] Mic button + TTS reply (voice per Part 1)
+- [x] Mic button + TTS reply (voice per Part 1) — transcript is reviewed in the text box before sending (risk P5)
 - [ ] Local notifications for reminders
 
 ### 🚀 Phase 3: Beta
