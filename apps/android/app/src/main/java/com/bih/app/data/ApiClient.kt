@@ -98,12 +98,15 @@ class ApiClient(private val settings: SettingsStore) {
     private fun parseProfile(text: String): Map<String, String> =
         json.parseToJsonElement(text).jsonObject.mapValues { it.value.jsonPrimitive.content }
 
-    suspend fun getProfile(): Map<String, String> = call("/profile") { parseProfile(it) }
+    // Both keep the on-device cache in sync so the autofill service can
+    // fill forms without any network call.
+    suspend fun getProfile(): Map<String, String> =
+        call("/profile") { parseProfile(it) }.also { settings.profileCache = it }
 
     suspend fun putProfile(fields: Map<String, String>): Map<String, String> =
         call("/profile", "PUT", json.encodeToString(ProfileUpdate.serializer(), ProfileUpdate(fields))) {
             parseProfile(it)
-        }
+        }.also { settings.profileCache = it }
 
     suspend fun getTemplates(): List<PaperworkTemplate> =
         call("/paperwork/templates") { json.decodeFromString(it) }
