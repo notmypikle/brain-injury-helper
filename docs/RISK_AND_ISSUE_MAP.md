@@ -30,8 +30,8 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 |---|---|---|---|---|
 | S1 | API open to anyone on the network | 🟠 | ✅ | Optional `BIH_API_KEY` + `X-API-Key` header (constant-time comparison). Mandatory key once deployed off-device. |
 | S2 | Traffic unencrypted (plain HTTP on LAN) | 🟠 | 📋 | Termux/local use is loopback-only. Production: TLS via reverse proxy (Caddy/nginx) or Android Keystore-pinned cert. Never expose plain HTTP to the internet. |
-| S3 | Database readable if phone is stolen | 🔴 | 📋 | Phase 4: encryption at rest (SQLCipher) + Android app lock. Documented in PRIVACY_AND_SAFETY.md threats. |
-| S4 | API keys stored insecurely on device | 🟠 | 📋 | Android Keystore (per PRIVACY_AND_SAFETY.md). Never in code, never in git. |
+| S3 | Database readable if phone is stolen | 🔴 | 🛡️ | Partially mitigated today: Android full-disk encryption (default on all modern phones with a lock screen) protects `bih.db`, and the app's on-device secrets are Keystore-encrypted (S4). Phase 4 adds SQLCipher + app lock as belt-and-braces. |
+| S4 | API keys stored insecurely on device | 🟠 | ✅ | API key and cached profile encrypted with the Android Keystore (hardware-backed, non-extractable AES-256-GCM). Never in code, never in git. |
 | S5 | Prompt injection via web content or notes fed to LLM | 🟠 | 🛡️ | Domain allowlist planned; treat all stored text as untrusted context; system prompt hardening when LLM is wired in. |
 | S6 | Sensitive data in logs | 🟠 | 🛡️ | No request-body logging anywhere in the API. Rule: log metadata only, never user text. |
 | S7 | Dependency vulnerabilities | 🟡 | 🛡️ | Pinned versions + `pip-audit` in release checklist + GitHub Dependabot alerts. |
