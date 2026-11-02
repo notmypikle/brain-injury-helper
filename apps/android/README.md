@@ -1,6 +1,8 @@
 # Android App (Kotlin + Jetpack Compose)
 
-Screens: **Chat, Today, Notes, Routines, Settings** — all wired to the API.
+Screens: **Chat, Today, Notes, Routines, Forms, Settings** — all wired to the API.
+The **Forms** tab is the paperwork wizard: save your details once, pick a
+form, answer what's left, then copy the finished lines into the online form.
 
 ## First-time setup (step by step)
 1. Install **Android Studio** (free, from developer.android.com/studio).
