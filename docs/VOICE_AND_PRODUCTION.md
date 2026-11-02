@@ -62,8 +62,8 @@ User hears reply ← Android TextToSpeech ← {reply_text}
 - [ ] Optional local LLM for fully offline AI
 
 ## LAUNCH GATES (must be ✅ before public release)
-1. All 12+ tests passing, API key auth enabled
-2. Encryption at rest + export/delete working
+1. All tests passing (currently 25), API key auth enabled
+2. Encryption at rest + export/delete working — export/delete ✅, encryption at rest 📋
 3. Accessibility audit passed
 4. Legal: disclaimer reviewed, privacy policy published
 5. Every 🔴 row in RISK_AND_ISSUE_MAP.md is 🛡️ or ✅
