@@ -14,7 +14,7 @@ Privacy-first voice + text assistant for daily support, built for people with br
 ## Stack
 - `services/api`: Python FastAPI backend
 - `apps/cli`: Python command-line client
-- `apps/android`: Kotlin + Jetpack Compose app (planned)
+- `apps/android`: Kotlin + Jetpack Compose app (scaffolded — see its README)
 - `docs`: plan and privacy model
 
 ## Run the API (Termux or computer)
