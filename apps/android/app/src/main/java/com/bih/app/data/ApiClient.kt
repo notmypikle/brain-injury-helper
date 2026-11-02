@@ -4,6 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -90,4 +92,30 @@ class ApiClient(private val settings: SettingsStore) {
         }
 
     suspend fun deleteRoutine(id: Int): Unit = call("/routines/$id", "DELETE") { }
+
+    // --- Paperwork wizard ---
+
+    private fun parseProfile(text: String): Map<String, String> =
+        json.parseToJsonElement(text).jsonObject.mapValues { it.value.jsonPrimitive.content }
+
+    suspend fun getProfile(): Map<String, String> = call("/profile") { parseProfile(it) }
+
+    suspend fun putProfile(fields: Map<String, String>): Map<String, String> =
+        call("/profile", "PUT", json.encodeToString(ProfileUpdate.serializer(), ProfileUpdate(fields))) {
+            parseProfile(it)
+        }
+
+    suspend fun getTemplates(): List<PaperworkTemplate> =
+        call("/paperwork/templates") { json.decodeFromString(it) }
+
+    suspend fun fillPaperwork(templateId: String, values: Map<String, String>): PaperworkDocument =
+        call(
+            "/paperwork/fill", "POST",
+            json.encodeToString(FillRequest.serializer(), FillRequest(templateId, values)),
+        ) { json.decodeFromString(PaperworkDocument.serializer(), it) }
+
+    suspend fun listDocuments(): List<PaperworkDocument> =
+        call("/paperwork/documents") { json.decodeFromString(it) }
+
+    suspend fun deleteDocument(id: Int): Unit = call("/paperwork/documents/$id", "DELETE") { }
 }

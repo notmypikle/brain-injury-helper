@@ -45,6 +45,15 @@ Set `BIH_API_URL` to point the CLI at a different API address.
   `DELETE /reminders/{id}` — reminders with due times
 - `POST /routines` / `GET /routines` / `DELETE /routines/{id}` — step-by-step
   routine checklists
+- `GET /profile` / `PUT /profile` / `DELETE /profile/{key}` — personal details
+  stored once and used to auto-fill paperwork
+- `GET /paperwork/templates` — built-in form templates (doctor visit summary,
+  medication list, benefits/disability answers, emergency card)
+- `POST /paperwork/fill` — fill a template (auto-fills from profile, reports
+  what's still missing) and save the finished document
+- `GET /paperwork/documents` / `GET|DELETE /paperwork/documents/{id}` /
+  `GET /paperwork/documents/{id}/export` — manage and download finished
+  documents (plain-text export for copying into online forms)
 
 All data is stored locally in SQLite (`bih.db` by default; override with
 `BIH_DB_PATH`). Set `BIH_API_KEY` to require an `X-API-Key` header on every

@@ -32,6 +32,21 @@ CREATE TABLE IF NOT EXISTS routines (
     steps TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS profile (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    template_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    missing TEXT NOT NULL DEFAULT '[]',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 
@@ -154,4 +169,77 @@ def delete_routine(conn: sqlite3.Connection, routine_id: int) -> bool:
 def _routine_dict(row: sqlite3.Row) -> dict:
     d = dict(row)
     d["steps"] = json.loads(d["steps"])
+    return d
+
+
+# --- Profile (single-user personal details used to auto-fill paperwork) ----
+
+def get_profile(conn: sqlite3.Connection) -> dict:
+    rows = conn.execute("SELECT key, value FROM profile ORDER BY key").fetchall()
+    return {r["key"]: r["value"] for r in rows}
+
+
+def set_profile_fields(conn: sqlite3.Connection, fields: dict) -> dict:
+    for key, value in fields.items():
+        conn.execute(
+            "INSERT INTO profile (key, value, updated_at)"
+            " VALUES (?, ?, datetime('now'))"
+            " ON CONFLICT(key) DO UPDATE SET value = excluded.value,"
+            " updated_at = excluded.updated_at",
+            (key, value),
+        )
+    conn.commit()
+    return get_profile(conn)
+
+
+def delete_profile_field(conn: sqlite3.Connection, key: str) -> bool:
+    cur = conn.execute("DELETE FROM profile WHERE key = ?", (key,))
+    conn.commit()
+    return cur.rowcount > 0
+
+
+# --- Documents (filled paperwork) ------------------------------------------
+
+def add_document(
+    conn: sqlite3.Connection,
+    template_id: str,
+    title: str,
+    content: str,
+    missing: list[str],
+) -> dict:
+    cur = conn.execute(
+        "INSERT INTO documents (template_id, title, content, missing)"
+        " VALUES (?, ?, ?, ?)",
+        (template_id, title, content, json.dumps(missing)),
+    )
+    conn.commit()
+    return get_document(conn, cur.lastrowid)
+
+
+def get_document(conn: sqlite3.Connection, document_id: int) -> dict | None:
+    row = conn.execute(
+        "SELECT id, template_id, title, content, missing, created_at"
+        " FROM documents WHERE id = ?",
+        (document_id,),
+    ).fetchone()
+    return _document_dict(row) if row else None
+
+
+def list_documents(conn: sqlite3.Connection) -> list[dict]:
+    rows = conn.execute(
+        "SELECT id, template_id, title, content, missing, created_at"
+        " FROM documents ORDER BY id DESC"
+    ).fetchall()
+    return [_document_dict(r) for r in rows]
+
+
+def delete_document(conn: sqlite3.Connection, document_id: int) -> bool:
+    cur = conn.execute("DELETE FROM documents WHERE id = ?", (document_id,))
+    conn.commit()
+    return cur.rowcount > 0
+
+
+def _document_dict(row: sqlite3.Row) -> dict:
+    d = dict(row)
+    d["missing"] = json.loads(d["missing"])
     return d
