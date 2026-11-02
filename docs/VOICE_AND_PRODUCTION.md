@@ -42,7 +42,7 @@ User hears reply ← Android TextToSpeech ← {reply_text}
 - [x] Notes screen wired to `/notes`
 - [x] Settings: API address, API key (app lock still pending)
 - [x] Mic button + TTS reply (voice per Part 1) — transcript is reviewed in the text box before sending (risk P5)
-- [ ] Local notifications for reminders
+- [x] Local notifications for reminders (WorkManager; app also creates reminders now)
 
 ### 🚀 Phase 3: Beta
 - [ ] Closed beta via Play Console (10–20 real users from brain-injury communities)
