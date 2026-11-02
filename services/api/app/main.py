@@ -4,11 +4,12 @@ import secrets
 from contextlib import closing
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import db
+from . import db, paperwork
 
-app = FastAPI(title="BIH API", version="0.3.0")
+app = FastAPI(title="BIH API", version="0.4.0")
 
 
 async def require_api_key(request: Request) -> None:
@@ -201,3 +202,147 @@ def voice(req: VoiceRequest):
     text out (the device speaks it via its own TTS engine)."""
     result = chat(ChatRequest(message=req.transcript))
     return VoiceResponse(reply_text=result.reply, safety_flag=result.safety_flag)
+
+
+# --- Paperwork wizard (Phase 3) ---------------------------------------------
+# For forms that can only be filed online: store personal details once
+# (profile), pick a template, answer the remaining questions one at a time,
+# and get a finished document whose lines are easy to copy into a web form.
+
+PROFILE_KEY_PATTERN = re.compile(r"^[a-z0-9_]{1,60}$")
+
+
+class ProfileUpdate(BaseModel):
+    fields: dict[str, str] = Field(min_length=1, max_length=100)
+
+
+class TemplateField(BaseModel):
+    key: str
+    label: str
+    auto: bool
+
+
+class PaperworkTemplate(BaseModel):
+    id: str
+    title: str
+    description: str
+    fields: list[TemplateField]
+
+
+class FillRequest(BaseModel):
+    template_id: str = Field(min_length=1, max_length=60)
+    values: dict[str, str] = Field(default_factory=dict, max_length=100)
+
+
+class PaperworkDocument(BaseModel):
+    id: int
+    template_id: str
+    title: str
+    content: str
+    missing_fields: list[str]
+    created_at: str
+
+
+def _validate_profile_fields(fields: dict[str, str]) -> None:
+    for key, value in fields.items():
+        if not PROFILE_KEY_PATTERN.match(key):
+            raise HTTPException(
+                status_code=422,
+                detail=f"Invalid field name: {key!r}. Use lowercase letters, digits, underscores.",
+            )
+        if len(value) > 2000:
+            raise HTTPException(status_code=422, detail=f"Value for {key!r} is too long (max 2000 characters).")
+
+
+@app.get("/profile", response_model=dict[str, str],
+         dependencies=[Depends(require_api_key)])
+def get_profile():
+    with closing(db.connect()) as conn:
+        return db.get_profile(conn)
+
+
+@app.put("/profile", response_model=dict[str, str],
+         dependencies=[Depends(require_api_key)])
+def update_profile(update: ProfileUpdate):
+    _validate_profile_fields(update.fields)
+    with closing(db.connect()) as conn:
+        return db.set_profile_fields(conn, update.fields)
+
+
+@app.delete("/profile/{key}", status_code=204,
+            dependencies=[Depends(require_api_key)])
+def remove_profile_field(key: str):
+    with closing(db.connect()) as conn:
+        if not db.delete_profile_field(conn, key):
+            raise HTTPException(status_code=404, detail="Profile field not found")
+
+
+@app.get("/paperwork/templates", response_model=list[PaperworkTemplate],
+         dependencies=[Depends(require_api_key)])
+def list_templates():
+    return paperwork.TEMPLATES
+
+
+@app.post("/paperwork/fill", response_model=PaperworkDocument, status_code=201,
+          dependencies=[Depends(require_api_key)])
+def fill_paperwork(req: FillRequest):
+    template = paperwork.get_template(req.template_id)
+    if template is None:
+        raise HTTPException(status_code=404, detail="Unknown template")
+    _validate_profile_fields(req.values)
+    with closing(db.connect()) as conn:
+        profile = db.get_profile(conn)
+        content, missing = paperwork.render(template, profile, req.values)
+        doc = db.add_document(conn, template["id"], template["title"], content, missing)
+    return _document_response(doc)
+
+
+@app.get("/paperwork/documents", response_model=list[PaperworkDocument],
+         dependencies=[Depends(require_api_key)])
+def get_documents():
+    with closing(db.connect()) as conn:
+        return [_document_response(d) for d in db.list_documents(conn)]
+
+
+@app.get("/paperwork/documents/{document_id}", response_model=PaperworkDocument,
+         dependencies=[Depends(require_api_key)])
+def get_document(document_id: int):
+    with closing(db.connect()) as conn:
+        doc = db.get_document(conn, document_id)
+        if doc is None:
+            raise HTTPException(status_code=404, detail="Document not found")
+        return _document_response(doc)
+
+
+@app.get("/paperwork/documents/{document_id}/export",
+         dependencies=[Depends(require_api_key)])
+def export_document(document_id: int):
+    with closing(db.connect()) as conn:
+        doc = db.get_document(conn, document_id)
+        if doc is None:
+            raise HTTPException(status_code=404, detail="Document not found")
+    return PlainTextResponse(
+        doc["content"],
+        headers={
+            "Content-Disposition": f'attachment; filename="document-{document_id}.txt"'
+        },
+    )
+
+
+@app.delete("/paperwork/documents/{document_id}", status_code=204,
+            dependencies=[Depends(require_api_key)])
+def remove_document(document_id: int):
+    with closing(db.connect()) as conn:
+        if not db.delete_document(conn, document_id):
+            raise HTTPException(status_code=404, detail="Document not found")
+
+
+def _document_response(doc: dict) -> PaperworkDocument:
+    return PaperworkDocument(
+        id=doc["id"],
+        template_id=doc["template_id"],
+        title=doc["title"],
+        content=doc["content"],
+        missing_fields=doc["missing"],
+        created_at=doc["created_at"],
+    )

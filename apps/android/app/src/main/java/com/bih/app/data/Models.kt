@@ -33,3 +33,32 @@ data class RoutineIn(val name: String, val steps: List<String>)
 
 @Serializable
 data class Routine(val id: Int, val name: String, val steps: List<String>, val created_at: String)
+
+// --- Paperwork wizard ---
+
+@Serializable
+data class ProfileUpdate(val fields: Map<String, String>)
+
+@Serializable
+data class TemplateField(val key: String, val label: String, val auto: Boolean)
+
+@Serializable
+data class PaperworkTemplate(
+    val id: String,
+    val title: String,
+    val description: String,
+    val fields: List<TemplateField>,
+)
+
+@Serializable
+data class FillRequest(val template_id: String, val values: Map<String, String>)
+
+@Serializable
+data class PaperworkDocument(
+    val id: Int,
+    val template_id: String,
+    val title: String,
+    val content: String,
+    val missing_fields: List<String>,
+    val created_at: String,
+)
