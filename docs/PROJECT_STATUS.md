@@ -27,6 +27,12 @@ Last updated: 2026-11-02
   - Android: new **Forms** tab — My details editor, form picker, one-field-
     at-a-time fill with profile pre-fill, copy-friendly document view.
   - 21 API tests passing (9 new for paperwork).
+- **Online auto-fill (part 2, user-requested):** Android Autofill service
+  (`apps/android/.../autofill/`) that pushes saved My-details answers
+  straight into web forms. Confirmation screen shows every field before
+  anything is filled; passwords/usernames/cards are never touched; the
+  service reads only the on-device profile cache (no network). Needs
+  on-device testing — see next steps.
 - **Not yet verified:** the Android project has not been built (needs
   Android Studio / Android SDK, which this environment doesn't have).
   First build may need small fixes — treat that as expected, not a failure.
@@ -34,9 +40,10 @@ Last updated: 2026-11-02
 ## Where we left off / next steps (in order)
 1. **Open `apps/android` in Android Studio and build it.** Fix any
    first-build errors (risk I6 in RISK_AND_ISSUE_MAP.md).
-2. **Online auto-fill, part 2** (user-requested): an Android Autofill
-   service / copy-helper that pushes wizard answers directly into web
-   forms, so online-only paperwork is filled without manual copying.
+2. **Enable and test the new autofill service on a real device/emulator:**
+   Settings → System → Autofill service → choose B.I.H. Then open an
+   online form and check the confirmation screen appears (risk S11).
+   Save My details in the Forms tab first — autofill reads that cache.
 3. Add the mic button + TextToSpeech reply on the Chat screen
    (voice per VOICE_AND_PRODUCTION.md Part 1).
 4. Local notifications for reminders (Android `WorkManager`/`AlarmManager`).

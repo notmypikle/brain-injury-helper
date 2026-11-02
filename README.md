@@ -55,6 +55,12 @@ Set `BIH_API_URL` to point the CLI at a different API address.
   `GET /paperwork/documents/{id}/export` — manage and download finished
   documents (plain-text export for copying into online forms)
 
+For forms that can only be filed online, the Android app also provides an
+**autofill service**: after saving your details in the Forms tab, enable
+B.I.H. under Settings → System → Autofill service, and it offers to fill
+matching web-form fields — always with a confirmation screen first, and
+never passwords, usernames, or card details.
+
 All data is stored locally in SQLite (`bih.db` by default; override with
 `BIH_DB_PATH`). Set `BIH_API_KEY` to require an `X-API-Key` header on every
 endpoint except `/health`.

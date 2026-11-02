@@ -20,5 +20,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Confirmation screen shown before any autofill happens. Not
+             reachable from other apps. -->
+        <activity
+            android:name=".autofill.FillConfirmationActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.BIH" />
+
+        <!-- Autofill service: the system binds to it (permission-guarded).
+             Only ever reads the local profile cache; see BihAutofillService. -->
+        <service
+            android:name=".autofill.BihAutofillService"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/autofill_service" />
+        </service>
     </application>
 </manifest>

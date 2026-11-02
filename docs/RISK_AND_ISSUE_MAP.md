@@ -38,7 +38,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | S8 | No data export/delete mechanism yet (GDPR-style rights) | 🟠 | 📋 | Phase 4 explicitly includes export/delete/wipe. Until then, deleting `bih.db` wipes everything — documented for users. |
 | S9 | Crisis-data liability (app detects crisis, user harmed anyway) | 🔴 | 🛡️ | Disclaimer in README: not a medical provider. Crisis reply directs to human help immediately. Legal review before public launch. |
 | S10 | Profile & paperwork documents concentrate PII/medical data (name, DOB, conditions, medications) | 🔴 | 🛡️ | Local-only storage, never sent to any LLM/cloud by default. Exported documents are plain text — warn users to store/share them carefully. Phase 4 encryption at rest (S3) covers these tables too. Field values are length-capped and keys whitelisted to a safe pattern. |
-| S11 | Autofill service (planned) could leak profile data into wrong app/website | 🟠 | 📋 | When building online auto-fill: match only user-confirmed apps/sites, require explicit per-field confirmation, never autofill on unrecognized pages. Reuse Android Autofill framework's built-in protections. |
+| S11 | Autofill service could leak profile data into wrong app/website | 🟠 | 🛡️ | Built with conservative field matching; passwords/usernames/cards never touched; nothing fills without the confirmation screen showing every field+value; service reads only the local profile cache (no network); `onSaveRequest` ignored so nothing typed on sites is captured. Verify on a real device before release. |
 
 ## 3. INSTALLATION ISSUES
 
