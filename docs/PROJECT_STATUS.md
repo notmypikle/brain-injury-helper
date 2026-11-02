@@ -12,7 +12,7 @@ Last updated: 2026-11-02
 | Phase 0 — scaffolding, health check, SQLite, privacy doc | ✅ Done | |
 | Phase 1 — chat, notes, reminders, routines | ✅ Done | 12 tests passing |
 | Phase 2 — Android app | 🔨 In progress | Scaffolded; screens wired to API (see below) |
-| Phase 3 — voice, paperwork, export | 🔶 Partial | `/voice` endpoint done; paperwork wizard + text export done (API + Android Forms tab); Android voice UI not started |
+| Phase 3 — voice, paperwork, export | 🔶 Mostly done | Voice (mic + TTS on Chat), paperwork wizard + export all built; needs on-device testing |
 | Phase 4 — encryption at rest, export/delete, local LLM | 📋 Planned | Launch gates, see VOICE_AND_PRODUCTION.md |
 
 ## What was done this session
@@ -33,6 +33,11 @@ Last updated: 2026-11-02
   anything is filled; passwords/usernames/cards are never touched; the
   service reads only the on-device profile cache (no network). Needs
   on-device testing — see next steps.
+- **Voice on the Chat screen:** mic button (on-device SpeechRecognizer;
+  transcript lands in the text box for review before sending — risk P5)
+  and spoken replies via on-device TextToSpeech with a mute toggle.
+- **Reminder time validation (risk P2):** API rejects non-ISO-8601
+  `due_at` values with 422; 2 new tests (23 total passing).
 - **Not yet verified:** the Android project has not been built (needs
   Android Studio / Android SDK, which this environment doesn't have).
   First build may need small fixes — treat that as expected, not a failure.
@@ -44,11 +49,8 @@ Last updated: 2026-11-02
    Settings → System → Autofill service → choose B.I.H. Then open an
    online form and check the confirmation screen appears (risk S11).
    Save My details in the Forms tab first — autofill reads that cache.
-3. Add the mic button + TextToSpeech reply on the Chat screen
-   (voice per VOICE_AND_PRODUCTION.md Part 1).
-4. Local notifications for reminders (Android `WorkManager`/`AlarmManager`).
-5. Reminder timezone validation (risk P2) — Android sends local time + offset.
-6. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
+3. Local notifications for reminders (Android `WorkManager`/`AlarmManager`).
+4. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
 
 ## Session checklist (do this every session)
 1. Read this file first.
