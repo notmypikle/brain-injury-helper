@@ -37,6 +37,20 @@ cd brain-injury-helper && git pull
 1. B.I.H. app → **Settings** tab → API address: `http://127.0.0.1:8000` → **Save**
 2. **Chat** tab → type "hello" → Send. A reply means everything works.
 
+## Optional — auto-start the API (never open Termux again)
+Install **Termux:Boot** from https://github.com/termux/termux-boot/releases/latest
+(the **github-debug.apk** — it must match your GitHub-installed Termux; the
+F-Droid build conflicts and won't install. If Play Protect warns, tap
+"More details" → "Install anyway").
+
+1. Open the Termux:Boot app once, then close it.
+2. In Termux, paste this one line:
+   ```bash
+   mkdir -p ~/.termux/boot && printf '#!/data/data/com.termux/files/usr/bin/sh\ntermux-wake-lock\ncd ~/brain-injury-helper/services/api && uvicorn app.main:app --host 127.0.0.1 --port 8000\n' > ~/.termux/boot/start-bih.sh && chmod +x ~/.termux/boot/start-bih.sh
+   ```
+3. Phone Settings → Apps → Termux → Battery → **Unrestricted**.
+4. Restart the phone — the API starts by itself ~30 seconds after boot.
+
 ## Optional — lock the API down
 Set a key before starting uvicorn:
 ```bash
