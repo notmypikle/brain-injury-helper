@@ -5,6 +5,14 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Required by ContextCompat.registerReceiver(RECEIVER_NOT_EXPORTED)
+         on Android 8–12 — without this the accessibility service crashes
+         on bind on those versions (security review defect fix). -->
+    <permission
+        android:name="com.bih.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.bih.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+
     <!-- usesCleartextTraffic is allowed ONLY for local development (the API
          runs on your own device/network over http). Before any public
          release the API must be behind TLS and this removed (risk S2). -->

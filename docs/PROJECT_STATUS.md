@@ -30,9 +30,15 @@ Last updated: 2026-11-02
   (subject access), adjustments request. Hard rule: letters and
   information only, NEVER legal advice; every template says so and points
   to free qualified help (risk S14, enforced by a test).
+- **2026-11-10 — Voice separation / "who said what"** (user saw an article
+  on AI separating overlapping voices): future feature idea — conversation
+  notes that transcribe WHO said WHAT (memory support after group
+  conversations or appointments), possibly focus-one-voice listening.
+  Now feasible on-device (Pyannote 4.0 diarization, on-device separation),
+  which fits the privacy model. Phase 5+.
 - **2026-11-10 — Interested in:** AI security review of the code (like
   GPT-6 Cyber) and on-device AI via LiteRT/Gemini Nano for real chat
-  answers. Both queued below.
+  answers. Security review DONE (see below); on-device AI chat queued.
 
 ## What was done this session
 - Created this status file.
@@ -72,6 +78,18 @@ Last updated: 2026-11-02
   are now encrypted with the Android Keystore (hardware-backed
   AES-256-GCM). S3 partially mitigated via Android full-disk encryption;
   SQLCipher remains the Phase 4 belt-and-braces step.
+
+## Security review (2026-11-10 — user-requested)
+Full codebase audit by a dedicated review agent. **2 findings + 1 defect,
+all fixed same day:**
+1. 🟡 Mic could send voice off-device → now prefers on-device recognition
+   and warns the user when unavailable (risk P11).
+2. ⚪ Screen-fill re-scanned after confirmation → now fills ONLY the exact
+   boxes the user confirmed.
+3. 🐛 Accessibility service crashed on Android 8–12 → manifest permission
+   added.
+Everything else checked clean (auth coverage, SQL, template injection,
+Keystore encryption, exported components, DoS limits).
 
 ## Where we left off / next steps (in order)
 1. **Merge the open PRs, install the APK from the Actions tab, and test on

@@ -20,11 +20,14 @@ import com.bih.app.ui.theme.BihTheme
 // asks before doing anything. "Not now" shares nothing and closes.
 class ScreenFillConfirmationActivity : ComponentActivity() {
 
+    private var labels: List<String> = emptyList()
+    private var values: List<String> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val labels = intent.getStringArrayListExtra(EXTRA_LABELS) ?: run { finish(); return }
-        val values = intent.getStringArrayListExtra(EXTRA_VALUES) ?: run { finish(); return }
+        labels = intent.getStringArrayListExtra(EXTRA_LABELS) ?: run { finish(); return }
+        values = intent.getStringArrayListExtra(EXTRA_VALUES) ?: run { finish(); return }
         val hasSubmit = intent.getBooleanExtra(EXTRA_HAS_SUBMIT, false)
         if (labels.isEmpty() || labels.size != values.size) {
             finish(); return
@@ -79,11 +82,14 @@ class ScreenFillConfirmationActivity : ComponentActivity() {
 
     private fun confirm(includeSubmit: Boolean) {
         // Tell the service to do the fill. setPackage keeps this broadcast
-        // private to our own app.
+        // private to our own app. Security review fix (Nov 2026): send back
+        // the exact list the user reviewed so ONLY those boxes get filled.
         sendBroadcast(
             Intent(BihAccessibilityService.ACTION_FILL_CONFIRMED)
                 .setPackage(packageName)
-                .putExtra(BihAccessibilityService.EXTRA_INCLUDE_SUBMIT, includeSubmit),
+                .putExtra(BihAccessibilityService.EXTRA_INCLUDE_SUBMIT, includeSubmit)
+                .putStringArrayListExtra(BihAccessibilityService.EXTRA_CONFIRM_LABELS, ArrayList(labels))
+                .putStringArrayListExtra(BihAccessibilityService.EXTRA_CONFIRM_VALUES, ArrayList(values)),
         )
         finish()
     }
