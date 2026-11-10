@@ -28,7 +28,29 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- USER REQUEST (2026-11-10): "can I say hey B.I.H. like Gemini
+                 or Bixby?" A true wake word needs phone-maker privileges,
+                 but this lets B.I.H. become the DEFAULT ASSISTANT app — the
+                 same hold-home-button / corner-swipe gesture Gemini uses
+                 then opens B.I.H. from anywhere, even when closed. -->
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
+
+        <!-- Quick Settings tile: swipe down from the top of any screen,
+             tap B.I.H., app opens. -->
+        <service
+            android:name=".BihTileService"
+            android:label="@string/app_name"
+            android:icon="@android:drawable/ic_btn_speak_now"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <!-- Confirmation screen shown before any autofill happens. Not
              reachable from other apps. -->
