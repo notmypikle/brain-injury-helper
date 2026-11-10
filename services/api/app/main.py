@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import assistant, db, paperwork
+from . import assistant, calm, db, paperwork
 
 app = FastAPI(title="BIH API", version="0.4.0")
 
@@ -196,6 +196,21 @@ def remove_routine(routine_id: int):
     with closing(db.connect()) as conn:
         if not db.delete_routine(conn, routine_id):
             raise HTTPException(status_code=404, detail="Routine not found")
+
+
+# --- Calm mode ("Too much") ---------------------------------------------------
+# Overstimulation support (user's core accessibility need, 2026-11-10).
+# Static grounding steps — the app also bundles a copy so calm mode works
+# even when the API can't be reached.
+
+class CalmSteps(BaseModel):
+    steps: list[str]
+
+
+@app.get("/calm/steps", response_model=CalmSteps,
+         dependencies=[Depends(require_api_key)])
+def calm_steps():
+    return CalmSteps(steps=calm.STEPS)
 
 
 # --- Voice (Phase 3) --------------------------------------------------------

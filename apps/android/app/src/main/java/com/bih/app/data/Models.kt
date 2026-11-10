@@ -11,6 +11,9 @@ data class ChatRequest(val message: String)
 data class ChatResponse(val reply: String, val safety_flag: Boolean = false)
 
 @Serializable
+data class CalmSteps(val steps: List<String>)
+
+@Serializable
 data class NoteIn(val text: String)
 
 @Serializable

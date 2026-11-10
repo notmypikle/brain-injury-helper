@@ -81,7 +81,7 @@ private val WELCOME = Message(
 // - Replies are spoken with the device's TextToSpeech. The speaker button
 //   mutes/unmutes. Text input is always equally available.
 @Composable
-fun ChatScreen(api: ApiClient) {
+fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
     val messages = ChatState.messages
     var input by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
@@ -185,6 +185,14 @@ fun ChatScreen(api: ApiClient) {
     }
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
+        // Core accessibility need (2026-11-10): one tap out of overload,
+        // always visible at the top of the chat.
+        OutlinedButton(
+            onClick = onOpenCalm,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        ) {
+            Text("😮‍💨 Too much? Tap here")
+        }
         LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
             items(messages) { msg ->
                 val bg = when {

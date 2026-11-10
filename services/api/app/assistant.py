@@ -17,7 +17,7 @@ import re
 import sqlite3
 from datetime import datetime, timedelta
 
-from . import db
+from . import calm, db
 
 REMINDER_RE = re.compile(
     r"\b(?:remind me (?:to|about)|remember to) (.+)$", re.IGNORECASE
@@ -39,6 +39,15 @@ WHEN_IS_RE = re.compile(
     r"\b(?:what time is|when is|when'?s) (?:my |the )?(.+?)\??\s*$",
     re.IGNORECASE,
 )
+# Overstimulation ("it's too much") — a core accessibility need
+# (2026-11-10), handled by calm mode. Crisis detection in main.py runs
+# BEFORE this and always wins.
+OVERLOAD_RE = re.compile(
+    r"\b(too much|overwhelm\w*|too loud|too busy|can'?t cope|can'?t think"
+    r"|too many (things|people|sounds|noises)|sensory overload"
+    r"|shut ?down|meltdown)\b",
+    re.IGNORECASE,
+)
 GREETING_RE = re.compile(
     r"^\s*(hi+|hello+|hey+|good (morning|afternoon|evening))\b", re.IGNORECASE
 )
@@ -53,6 +62,7 @@ TOMORROW_RE = re.compile(r"\btomorrow\b", re.IGNORECASE)
 def respond(message: str, conn: sqlite3.Connection) -> str:
     """Turn a user message into a helpful reply, using local features."""
     for handler in (
+        _overload_intent,
         _reminder_intent,
         _note_intent,
         _when_is_intent,
@@ -193,6 +203,15 @@ def _routine_intent(message: str, conn: sqlite3.Connection) -> str | None:
         names = ", ".join(r["name"] for r in routines)
         return f"I don't have a routine called \"{name}\". Yours are: {names}."
     return "No routines yet. Make one in the Routines tab and I'll walk you through it."
+
+
+# --- Overstimulation / calm mode --------------------------------------------
+
+def _overload_intent(message: str, conn: sqlite3.Connection) -> str | None:
+    """'It's too much' → start calming immediately + point at calm mode."""
+    if not OVERLOAD_RE.search(message):
+        return None
+    return calm.OVERLOAD_REPLY
 
 
 # --- Small talk / guidance ---------------------------------------------------
