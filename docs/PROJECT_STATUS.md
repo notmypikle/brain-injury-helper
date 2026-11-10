@@ -80,7 +80,9 @@ phone's main.py (fixed via git reset --hard origin/main).
   Android: new Calm screen (one big-text step at a time, read-aloud OFF
   by default, bundled fallback steps so it works even with the API down)
   + always-visible "Too much? Tap here" button on Chat and Today.
-  PR #19 open, CI build green; 46 API tests passing (6 new).
+  **MERGED (PR #19, merged by Copilot at the user's request) and
+  published as B.I.H. v0.1.4 on the `apk` branch.** 46 API tests
+  passing (6 new). Pending: on-device test by the user.
 - **Published B.I.H. v0.1.3 to the `apk` branch** (built from CI run
   42922012521, PR #18 merge): real local assistant + hardened chat
   persistence. The direct download now has the assistant build.
@@ -144,14 +146,14 @@ Keystore encryption, exported components, DoS limits).
 2. **On-device feature tests** (user, at their own pace): autofill service
    (Settings → System → Autofill service → B.I.H.), screen-fill service
    (Settings → Accessibility → B.I.H.; Android 13+ restricted settings —
-   risk I7), reminder notifications, Forms wizard, **calm mode** (once
-   PR #19 is merged + installed: "Too much" button, and saying "it's too
-   much" to the assistant).
-3. **Merge PR #19 (calm mode)** then publish v0.1.4 to the `apk` branch
-   from that CI build.
+   risk I7), reminder notifications, Forms wizard, **calm mode** (v0.1.4:
+   "Too much" button on Chat/Today, and saying "it's too much" to the
+   assistant).
+3. ✅ DONE 2026-11-10: PR #19 (calm mode) merged, v0.1.4 published to the
+   `apk` branch (CI run 42926370246).
 4. **Overstimulation support** (user's core need, 2026-11-10): ✅ "too
-   much" calm-mode button coded (PR #19, CI green; needs merge + on-device
-   test). Later: who-said-what / focus-one-voice.
+   much" calm-mode button DONE (PR #19 merged, v0.1.4; on-device test
+   pending). Later: who-said-what / focus-one-voice.
 5. **On-device AI chat, part 2** (user-approved interest, 2026-11-10):
    part 1 DONE — local assistant with real intents (app/assistant.py).
    Part 2: layer Gemini Nano/LiteRT free-form conversation on top, with
