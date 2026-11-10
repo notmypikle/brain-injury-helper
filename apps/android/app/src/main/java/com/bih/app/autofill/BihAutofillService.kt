@@ -141,6 +141,9 @@ class BihAutofillService : AutofillService() {
             has("phone", "tel", "telephone", "mobile") -> "phone"
             has("dob", "birthdate", "birthday") || hay.contains("birth") -> "dob"
             has("address", "postal", "street") -> "address"
+            // User request: signature boxes get the typed full name (a
+            // legally recognised e-signature on most online forms).
+            has("signature") || hay.contains("sign here") -> "full_name"
             has("name", "fullname", "surname") && !has("username", "login") -> "full_name"
             else -> null
         }

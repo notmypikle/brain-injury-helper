@@ -43,5 +43,26 @@
                 android:name="android.autofill"
                 android:resource="@xml/autofill_service" />
         </service>
+
+        <!-- Screen-reading + filling service (user's cross-app idea).
+             Only acts when the user taps the system accessibility button;
+             see BihAccessibilityService for the safety rules. -->
+        <activity
+            android:name=".autofill.ScreenFillConfirmationActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.BIH" />
+
+        <service
+            android:name=".autofill.BihAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
     </application>
 </manifest>

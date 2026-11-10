@@ -66,6 +66,13 @@ B.I.H. under Settings → System → Autofill service, and it offers to fill
 matching web-form fields — always with a confirmation screen first, and
 never passwords, usernames, or card details.
 
+It also provides an **accessibility service** for cross-app help (works in
+any app, not just browsers): tap the accessibility button on any screen and
+B.I.H. offers to fill recognised empty boxes with your saved details, and
+can tap Send/Submit — always after your explicit confirmation. Signature
+boxes receive your typed full name (a legally recognised e-signature), and
+a drawn signature can be saved encrypted on-device in the Forms tab.
+
 All data is stored locally in SQLite (`bih.db` by default; override with
 `BIH_DB_PATH`). Set `BIH_API_KEY` to require an `X-API-Key` header on every
 endpoint except `/health`.
