@@ -9,7 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
-from . import db, paperwork
+from . import assistant, db, paperwork
 
 app = FastAPI(title="BIH API", version="0.4.0")
 
@@ -98,8 +98,10 @@ def health():
 def chat(req: ChatRequest):
     if CRISIS_PATTERN.search(req.message):
         return ChatResponse(reply=CRISIS_REPLY, safety_flag=True)
-    # Placeholder until an LLM provider is wired in.
-    return ChatResponse(reply=f"I hear you. You said: {req.message}")
+    # Real local assistant (replaced the placeholder echo after user
+    # feedback 2026-11-10). Uses notes/reminders/routines; no network.
+    with closing(db.connect()) as conn:
+        return ChatResponse(reply=assistant.respond(req.message, conn))
 
 
 @app.post("/notes", response_model=Note, status_code=201,

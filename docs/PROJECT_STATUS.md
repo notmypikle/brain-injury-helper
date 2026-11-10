@@ -57,9 +57,16 @@ phone's main.py (fixed via git reset --hard origin/main).
   as the DEFAULT ASSISTANT (hold-home / corner-swipe opens it from
   anywhere, even closed) + a Quick Settings tile. If Android ever opens
   wake words to third parties, revisit.
+- **2026-11-10 — "B.I.H. only repeats what I ask it — fix that"**: replaced
+  the placeholder echo with a real LOCAL assistant (app/assistant.py):
+  sets reminders with time parsing ("at 6 pm", "in 30 minutes",
+  "tomorrow"), saves notes, lists the day, looks up saved items, walks
+  through routines, greets/thanks/help — all on-device, no LLM, crisis
+  detection still runs first. 12 new tests (40 total).
 - **2026-11-10 — First real-use bug report** (user testing!): chat wiped
   on tab switch + blank page on open → fixed (app-level ChatState +
-  welcome message).
+  welcome message), then hardened to persist chat encrypted on-device so
+  it survives app restarts too.
 - **2026-11-10 — Interested in:** AI security review of the code (like
   GPT-6 Cyber) and on-device AI via LiteRT/Gemini Nano for real chat
   answers. Security review DONE (see below); on-device AI chat queued.
@@ -122,9 +129,10 @@ Keystore encryption, exported components, DoS limits).
    (Settings → System → Autofill service → B.I.H.), screen-fill service
    (Settings → Accessibility → B.I.H.; Android 13+ restricted settings —
    risk I7), reminder notifications, Forms wizard.
-3. **On-device AI chat** via Gemini Nano/LiteRT (user-approved interest,
-   2026-11-10) — replaces the placeholder chat reply with real on-device
-   answers; private and free.
+3. **On-device AI chat, part 2** (user-approved interest, 2026-11-10):
+   part 1 DONE — local assistant with real intents (app/assistant.py).
+   Part 2: layer Gemini Nano/LiteRT free-form conversation on top, with
+   the assistant module as the tool-use/fallback layer.
 4. **Overstimulation support** (user's core need, 2026-11-10): "too much"
    calm-mode button; later who-said-what / focus-one-voice.
 5. **E-signature follow-up:** stamp the drawn signature into exported

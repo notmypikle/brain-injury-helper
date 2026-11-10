@@ -36,8 +36,11 @@ Set `BIH_API_URL` to point the CLI at a different API address.
 
 ## API endpoints
 - `GET /health` — liveness check (always open)
-- `POST /chat` — chat reply; detects possible crisis language and responds
-  with crisis guidance plus a `safety_flag` (see `docs/PRIVACY_AND_SAFETY.md`)
+- `POST /chat` — the local assistant: sets reminders ("remind me to take
+  meds at 6 pm"), saves notes ("remember that…"), reads your day ("what's
+  on today"), looks things up ("when is my dentist?"), and walks through
+  routines — all on-device, no LLM. Crisis language still always gets the
+  crisis reply plus a `safety_flag` (see `docs/PRIVACY_AND_SAFETY.md`)
 - `POST /voice` — single round-trip for voice clients: transcript in,
   reply text out (device handles speech-to-text and text-to-speech
   on-device; see `docs/VOICE_AND_PRODUCTION.md`)
