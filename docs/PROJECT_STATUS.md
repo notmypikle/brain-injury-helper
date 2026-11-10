@@ -3,7 +3,18 @@
 *Where the project stands and what's next. Update this file at the end of
 every work session so the next session can pick up without re-discovery.*
 
-Last updated: 2026-11-02
+Last updated: 2026-11-10
+
+## 🏆 Milestone: RUNNING ON THE USER'S PHONE (2026-11-10)
+The full stack is live on-device: app (APK from CI, via the `apk` branch
+direct-download) + API in Termux (F-Droid build) + Termux:Boot auto-start
+(boot script at ~/.termux/boot/start-bih.sh, starts uvicorn ~30–60s after
+boot; both Termux and Termux:Boot set to Battery → Unrestricted).
+Chat + spoken replies confirmed working end-to-end by the user.
+Gotchas encountered (all fixed/documented in docs/PHONE_SETUP.md):
+VPN blocking loopback (test with VPN off), sideload signature match
+(Termux F-Droid ↔ Termux:Boot F-Droid), stray text once corrupted the
+phone's main.py (fixed via git reset --hard origin/main).
 
 ## Current state
 
@@ -95,18 +106,20 @@ Everything else checked clean (auth coverage, SQL, template injection,
 Keystore encryption, exported components, DoS limits).
 
 ## Where we left off / next steps (in order)
-1. **Merge the open PRs, install the APK from the Actions tab, and test on
-   the phone:** autofill service (Settings → System → Autofill service →
-   B.I.H.) and the new screen-fill service (Settings → Accessibility →
-   B.I.H.; on Android 13+ first allow restricted settings — see risk I7).
-2. **Security review of the API code** (user-approved interest,
-   2026-11-10).
+1. ✅ DONE 2026-11-10: app installed on the user's phone, API running in
+   Termux, auto-start on boot working, chat + voice verified end-to-end.
+2. **On-device feature tests** (user, at their own pace): autofill service
+   (Settings → System → Autofill service → B.I.H.), screen-fill service
+   (Settings → Accessibility → B.I.H.; Android 13+ restricted settings —
+   risk I7), reminder notifications, Forms wizard.
 3. **On-device AI chat** via Gemini Nano/LiteRT (user-approved interest,
    2026-11-10) — replaces the placeholder chat reply with real on-device
    answers; private and free.
-4. **E-signature follow-up:** stamp the drawn signature into exported
+4. **Overstimulation support** (user's core need, 2026-11-10): "too much"
+   calm-mode button; later who-said-what / focus-one-voice.
+5. **E-signature follow-up:** stamp the drawn signature into exported
    documents when PDF export is added (Phase 4).
-5. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
+6. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
 
 ## Session checklist (do this every session)
 1. Read this file first.
