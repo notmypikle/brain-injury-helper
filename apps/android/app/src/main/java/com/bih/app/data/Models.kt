@@ -62,3 +62,13 @@ data class PaperworkDocument(
     val missing_fields: List<String>,
     val created_at: String,
 )
+
+// --- E-signature (user's idea, Nov 2026) ---
+// A drawn signature is stored as strokes (lists of points), not an image
+// file — smaller, simpler, and encrypted the same way as the profile.
+
+@Serializable
+data class SignaturePoint(val x: Float, val y: Float)
+
+@Serializable
+data class SignatureStroke(val points: List<SignaturePoint>)

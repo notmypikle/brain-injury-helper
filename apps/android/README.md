@@ -28,7 +28,22 @@ form, answer what's left, then copy the finished lines into the online form.
 - `.../data/SettingsStore.kt` — API address + key storage
 - `.../ui/screens/` — one file per screen
 
+## Cross-app filling (user-requested feature)
+B.I.H. can fill boxes in **any app or website** using your saved details:
+1. Save your details in the app: **Forms → My details**.
+2. Android 13+ (sideloaded APK): **Settings → Apps → B.I.H. → ⋮ menu →
+   Allow restricted settings**.
+3. **Settings → Accessibility → B.I.H. → turn on**, and enable the
+   **accessibility button** when offered.
+4. On any form, tap the floating **accessibility button → B.I.H.** →
+   review the list of boxes → **Fill**. You can also tick "tap Send/Submit".
+Nothing is ever filled silently, and password boxes are never touched.
+
+## E-signature
+**Forms → My signature**: draw your signature once (encrypted, stays on the
+phone). Signature boxes on websites get your typed full name automatically —
+a legally recognised e-signature on most online forms.
+
 ## Not done yet (see docs/PROJECT_STATUS.md)
-- Mic button + spoken replies (voice, on-device)
-- Local notifications for reminders
-- App lock / Keystore for the API key
+- Drawn-signature stamping into exported PDF documents (Phase 4)
+- On-device AI answers in Chat (Gemini Nano / LiteRT)
