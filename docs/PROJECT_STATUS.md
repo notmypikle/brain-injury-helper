@@ -24,6 +24,12 @@ Last updated: 2026-11-02
   signature boxes. Risks S12/S13/I7 added to the risk map.
 - **2026-11-02 — Online document auto-fill** (both wizard + direct fill):
   paperwork wizard (merged) + autofill service (merged).
+- **2026-11-10 — Legal paperwork help** (user's words: "there's always
+  legal paperwork when dealing with life as a human"): 4 letter templates
+  added to the wizard — benefits appeal, formal complaint, records request
+  (subject access), adjustments request. Hard rule: letters and
+  information only, NEVER legal advice; every template says so and points
+  to free qualified help (risk S14, enforced by a test).
 - **2026-11-10 — Interested in:** AI security review of the code (like
   GPT-6 Cyber) and on-device AI via LiteRT/Gemini Nano for real chat
   answers. Both queued below.
