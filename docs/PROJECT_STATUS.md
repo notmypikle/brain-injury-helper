@@ -15,6 +15,25 @@ Last updated: 2026-11-02
 | Phase 3 — voice, paperwork, export | 🔶 Mostly done | Voice (mic + TTS on Chat), paperwork wizard + export all built; needs on-device testing |
 | Phase 4 — encryption at rest, export/delete, local LLM | 🔶 Partial | `GET /export` + `DELETE /data` done; encryption at rest + local LLM pending |
 
+## User ideas log (things the user asked for — keep building on these)
+- **2026-11-02 — Cross-app integration + e-signature** (user's words: needs
+  it as a core need): view whatever is on screen, fill it with
+  saved private details, e-sign. Built as: BihAccessibilityService
+  (screen fill with confirmation, optional Send/Submit tap) + draw-with-
+  finger signature pad (encrypted, on-device only) + typed e-signature in
+  signature boxes. Risks S12/S13/I7 added to the risk map.
+- **2026-11-02 — Online document auto-fill** (both wizard + direct fill):
+  paperwork wizard (merged) + autofill service (merged).
+- **2026-11-10 — Legal paperwork help** (a real need: "there's always
+  legal paperwork when dealing with life as a human"): 4 letter templates
+  added to the wizard — benefits appeal, formal complaint, records request
+  (subject access), adjustments request. Hard rule: letters and
+  information only, NEVER legal advice; every template says so and points
+  to free qualified help (risk S14, enforced by a test).
+- **2026-11-10 — Interested in:** AI security review of the code (like
+  GPT-6 Cyber) and on-device AI via LiteRT/Gemini Nano for real chat
+  answers. Both queued below.
+
 ## What was done this session
 - Created this status file.
 - Scaffolded `apps/android`: Kotlin + Jetpack Compose project with Chat,
@@ -55,14 +74,18 @@ Last updated: 2026-11-02
   SQLCipher remains the Phase 4 belt-and-braces step.
 
 ## Where we left off / next steps (in order)
-1. **Open `apps/android` in Android Studio and build it.** Fix any
-   first-build errors (risk I6 in RISK_AND_ISSUE_MAP.md). Phase 2 is now
-   fully coded — this build check is the gate.
-2. **Enable and test the new autofill service on a real device/emulator:**
-   Settings → System → Autofill service → choose B.I.H. Then open an
-   online form and check the confirmation screen appears (risk S11).
-   Save My details in the Forms tab first — autofill reads that cache.
-3. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
+1. **Merge the open PRs, install the APK from the Actions tab, and test on
+   the phone:** autofill service (Settings → System → Autofill service →
+   B.I.H.) and the new screen-fill service (Settings → Accessibility →
+   B.I.H.; on Android 13+ first allow restricted settings — see risk I7).
+2. **Security review of the API code** (user-approved interest,
+   2026-11-10).
+3. **On-device AI chat** via Gemini Nano/LiteRT (user-approved interest,
+   2026-11-10) — replaces the placeholder chat reply with real on-device
+   answers; private and free.
+4. **E-signature follow-up:** stamp the drawn signature into exported
+   documents when PDF export is added (Phase 4).
+5. Then Phase 3 beta items in VOICE_AND_PRODUCTION.md.
 
 ## Session checklist (do this every session)
 1. Read this file first.

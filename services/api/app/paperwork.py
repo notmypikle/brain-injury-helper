@@ -95,6 +95,131 @@ TEMPLATES: list[dict] = [
             "\nEffect on work or study:\n{work_impact}\n"
         ),
     },
+    # ------------------------------------------------------------------
+    # USER'S IDEA (Nov 2026): "legal paperwork — there's always legal
+    # paperwork when dealing with life as a human."
+    # These are LETTERS, not legal advice (risk S14): every description
+    # says so and points to free qualified help. B.I.H. never tells the
+    # user what the law says about their case — it helps them get their
+    # situation onto paper, one calm question at a time.
+    # ------------------------------------------------------------------
+    {
+        "id": "benefits-appeal-letter",
+        "title": "Benefits decision appeal letter",
+        "description": (
+            "Challenge a benefits decision you disagree with. This is a "
+            "letter template, not legal advice — free help: Citizens Advice "
+            "or a welfare rights adviser."
+        ),
+        "fields": [
+            {"key": "full_name", "label": "Your full name", "auto": True},
+            {"key": "dob", "label": "Date of birth", "auto": True},
+            {"key": "address", "label": "Home address", "auto": True},
+            {"key": "phone", "label": "Phone number", "auto": True},
+            {"key": "email", "label": "Email address", "auto": True},
+            {"key": "reference", "label": "Reference number on the decision letter", "auto": False},
+            {"key": "decision_date", "label": "Date on the decision letter", "auto": False},
+            {"key": "what_disagree", "label": "What decision are you challenging?", "auto": False},
+            {"key": "why_disagree", "label": "Why is it wrong? (in your own words)", "auto": False},
+        ],
+        "body": (
+            "{full_name}\n{address}\n{phone}\n{email}\n"
+            "\nDate of birth: {dob}\nReference: {reference}\n"
+            "\nTo whom it may concern,\n"
+            "\nI am writing to challenge the decision dated {decision_date} "
+            "(reference {reference}).\n"
+            "\nDecision I am challenging:\n{what_disagree}\n"
+            "\nWhy I believe the decision is wrong:\n{why_disagree}\n"
+            "\nPlease reconsider this decision and send me a written response.\n"
+            "\nYours faithfully,\n{full_name}\n"
+        ),
+    },
+    {
+        "id": "complaint-letter",
+        "title": "Formal complaint letter",
+        "description": (
+            "Complain to a company or service and say what you want done. "
+            "A letter template, not legal advice."
+        ),
+        "fields": [
+            {"key": "full_name", "label": "Your full name", "auto": True},
+            {"key": "address", "label": "Home address", "auto": True},
+            {"key": "email", "label": "Email address", "auto": True},
+            {"key": "company", "label": "Who are you complaining to?", "auto": False},
+            {"key": "what_happened", "label": "What happened?", "auto": False},
+            {"key": "when_happened", "label": "When did it happen?", "auto": False},
+            {"key": "what_you_want", "label": "What do you want them to do?", "auto": False},
+        ],
+        "body": (
+            "{full_name}\n{address}\n{email}\n"
+            "\nTo: {company}\n"
+            "\nDear Sir or Madam,\n"
+            "\nI am writing to make a formal complaint.\n"
+            "\nWhat happened:\n{what_happened}\n"
+            "\nWhen it happened: {when_happened}\n"
+            "\nWhat I would like you to do:\n{what_you_want}\n"
+            "\nPlease respond in writing within 14 days.\n"
+            "\nYours faithfully,\n{full_name}\n"
+        ),
+    },
+    {
+        "id": "records-request-letter",
+        "title": "Request for my records",
+        "description": (
+            "Ask an organisation for a copy of the records they hold about "
+            "you (a 'subject access request'). A letter template, not "
+            "legal advice."
+        ),
+        "fields": [
+            {"key": "full_name", "label": "Your full name", "auto": True},
+            {"key": "dob", "label": "Date of birth", "auto": True},
+            {"key": "address", "label": "Home address", "auto": True},
+            {"key": "email", "label": "Email address", "auto": True},
+            {"key": "organisation", "label": "Which organisation? (e.g. hospital, council)", "auto": False},
+            {"key": "records_wanted", "label": "Which records? (e.g. all medical notes)", "auto": False},
+            {"key": "date_range", "label": "Dates covering (e.g. 2024 to now)", "auto": False},
+        ],
+        "body": (
+            "{full_name}\n{address}\n{email}\n"
+            "\nTo: {organisation}\n"
+            "\nDear Sir or Madam,\n"
+            "\nI am requesting a copy of the personal data you hold about me. "
+            "This is a subject access request.\n"
+            "\nMy details:\nName: {full_name}\nDate of birth: {dob}\nAddress: {address}\n"
+            "\nRecords requested: {records_wanted}\nDates covering: {date_range}\n"
+            "\nPlease send the records to my address or email above.\n"
+            "\nYours faithfully,\n{full_name}\n"
+        ),
+    },
+    {
+        "id": "adjustments-request-letter",
+        "title": "Request for adjustments (work, housing, services)",
+        "description": (
+            "Ask an employer, landlord, or service for changes that make "
+            "things accessible for you. A letter template, not legal "
+            "advice — free help: Citizens Advice or a disability charity."
+        ),
+        "fields": [
+            {"key": "full_name", "label": "Your full name", "auto": True},
+            {"key": "address", "label": "Home address", "auto": True},
+            {"key": "email", "label": "Email address", "auto": True},
+            {"key": "recipient", "label": "Who is this to? (e.g. manager, landlord)", "auto": False},
+            {"key": "my_needs", "label": "What do you find difficult?", "auto": False},
+            {"key": "adjustments", "label": "What changes would help?", "auto": False},
+        ],
+        "body": (
+            "{full_name}\n{address}\n{email}\n"
+            "\nTo: {recipient}\n"
+            "\nDear Sir or Madam,\n"
+            "\nI am writing to request adjustments so that I can manage "
+            "day to day.\n"
+            "\nWhat I find difficult:\n{my_needs}\n"
+            "\nChanges that would help me:\n{adjustments}\n"
+            "\nI am happy to discuss this at a time that suits you. "
+            "Please respond in writing.\n"
+            "\nYours faithfully,\n{full_name}\n"
+        ),
+    },
     {
         "id": "emergency-card",
         "title": "Emergency information card",

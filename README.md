@@ -49,7 +49,10 @@ Set `BIH_API_URL` to point the CLI at a different API address.
 - `GET /profile` / `PUT /profile` / `DELETE /profile/{key}` — personal details
   stored once and used to auto-fill paperwork
 - `GET /paperwork/templates` — built-in form templates (doctor visit summary,
-  medication list, benefits/disability answers, emergency card)
+  medication list, benefits/disability answers, emergency card) plus legal
+  paperwork letters (benefits appeal, formal complaint, records request,
+  adjustments request). Letters and information only — **never legal advice**;
+  every legal template points to free qualified help.
 - `POST /paperwork/fill` — fill a template (auto-fills from profile, reports
   what's still missing) and save the finished document
 - `GET /paperwork/documents` / `GET|DELETE /paperwork/documents/{id}` /
@@ -65,6 +68,13 @@ For forms that can only be filed online, the Android app also provides an
 B.I.H. under Settings → System → Autofill service, and it offers to fill
 matching web-form fields — always with a confirmation screen first, and
 never passwords, usernames, or card details.
+
+It also provides an **accessibility service** for cross-app help (works in
+any app, not just browsers): tap the accessibility button on any screen and
+B.I.H. offers to fill recognised empty boxes with your saved details, and
+can tap Send/Submit — always after your explicit confirmation. Signature
+boxes receive your typed full name (a legally recognised e-signature), and
+a drawn signature can be saved encrypted on-device in the Forms tab.
 
 All data is stored locally in SQLite (`bih.db` by default; override with
 `BIH_DB_PATH`). Set `BIH_API_KEY` to require an `X-API-Key` header on every

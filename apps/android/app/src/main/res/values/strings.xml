@@ -3,4 +3,5 @@
     <string name="app_name">B.I.H.</string>
     <string name="autofill_service_description">Fills web forms with the details you saved in B.I.H. Nothing is filled without your confirmation.</string>
     <string name="autofill_banner">Fill with B.I.H. — tap to review</string>
+    <string name="a11y_service_description">B.I.H. reads the screen only when you tap the accessibility button, and can fill form boxes with your saved details after you confirm. Nothing is sent anywhere — everything stays on your phone.</string>
 </resources>
