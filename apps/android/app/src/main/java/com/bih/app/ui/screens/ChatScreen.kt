@@ -3,7 +3,9 @@ package com.bih.app.ui.screens
 import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.speech.RecognizerIntent
@@ -27,18 +29,44 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.bih.app.data.ApiClient
+import com.bih.app.data.KeystoreCipher
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.Locale
 
+@Serializable
 private data class Message(val text: String, val fromUser: Boolean, val isSafety: Boolean = false)
 
 // Bug fix (reported by user 2026-11-10): the chat lived inside the screen,
 // so switching tabs wiped it and reopening showed a blank page. ChatState
-// lives at app level, so the conversation survives tab switches for as
-// long as the app is running. (Saving history across app restarts is a
-// possible future feature.)
+// now ALSO persists to encrypted on-device storage, so the conversation
+// survives tab switches AND the app being closed/restarted.
 private object ChatState {
+    private const val KEY = "chat_history"
+    private const val MAX_MESSAGES = 100
     val messages = mutableStateListOf<Message>()
+    private var prefs: SharedPreferences? = null
+    private var loaded = false
+
+    fun init(context: Context) {
+        if (loaded) return
+        loaded = true
+        prefs = context.getSharedPreferences("bih_settings", Context.MODE_PRIVATE)
+        prefs?.getString(KEY, null)
+            ?.let { KeystoreCipher.decrypt(it) }
+            ?.let { runCatching { Json.decodeFromString<List<Message>>(it) }.getOrNull() }
+            ?.let { messages.addAll(it) }
+    }
+
+    fun save() {
+        while (messages.size > MAX_MESSAGES) messages.removeAt(0)
+        prefs?.edit()
+            ?.putString(KEY, KeystoreCipher.encrypt(Json.encodeToString(messages.toList())))
+            ?.apply()
+    }
 }
 
 private val WELCOME = Message(
@@ -61,10 +89,14 @@ fun ChatScreen(api: ApiClient) {
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val context = LocalContext.current
+    ChatState.init(context)
 
     // Greet on a fresh/empty chat so the page never looks blank.
     LaunchedEffect(Unit) {
-        if (messages.isEmpty()) messages.add(WELCOME)
+        if (messages.isEmpty()) {
+            messages.add(WELCOME)
+            ChatState.save()
+        }
     }
 
     // --- Text-to-speech (spoken replies) ---
@@ -137,6 +169,7 @@ fun ChatScreen(api: ApiClient) {
         busy = true
         notice = null
         messages.add(Message(text, fromUser = true))
+        ChatState.save()
         scope.launch {
             try {
                 val resp = api.chat(text)
@@ -145,6 +178,7 @@ fun ChatScreen(api: ApiClient) {
             } catch (e: ApiClient.ApiException) {
                 messages.add(Message(e.message ?: "Something went wrong.", fromUser = false))
             }
+            ChatState.save()
             busy = false
             listState.animateScrollToItem(messages.size - 1)
         }

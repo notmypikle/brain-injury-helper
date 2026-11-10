@@ -16,11 +16,12 @@ def test_health(client):
     assert r.json() == {"status": "ok"}
 
 
-def test_chat_echo(client):
+def test_chat_greeting(client):
+    """The placeholder echo was replaced by the real assistant (2026-11-10)."""
     r = client.post("/chat", json={"message": "hello"})
     assert r.status_code == 200
     body = r.json()
-    assert "hello" in body["reply"]
+    assert "reminder" in body["reply"]  # greeting explains capabilities
     assert body["safety_flag"] is False
 
 
