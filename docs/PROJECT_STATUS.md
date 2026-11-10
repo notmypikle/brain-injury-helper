@@ -31,11 +31,14 @@ Last updated: 2026-11-02
   information only, NEVER legal advice; every template says so and points
   to free qualified help (risk S14, enforced by a test).
 - **2026-11-10 — Voice separation / "who said what"** (user saw an article
-  on AI separating overlapping voices): future feature idea — conversation
+  on AI separating overlapping voices; real-world feedback: noise + too much
+  simultaneous stimulation is a genuine daily barrier — treat as a CORE
+  accessibility need, not a nice-to-have): future features — conversation
   notes that transcribe WHO said WHAT (memory support after group
-  conversations or appointments), possibly focus-one-voice listening.
-  Now feasible on-device (Pyannote 4.0 diarization, on-device separation),
-  which fits the privacy model. Phase 5+.
+  conversations or appointments), focus-one-voice listening, and possibly
+  an in-the-moment "overload" helper (calm, one-step guidance when things
+  get too loud/busy). Now feasible on-device (Pyannote 4.0 diarization,
+  on-device separation), which fits the privacy model. Phase 5+.
 - **2026-11-10 — Interested in:** AI security review of the code (like
   GPT-6 Cyber) and on-device AI via LiteRT/Gemini Nano for real chat
   answers. Security review DONE (see below); on-device AI chat queued.
