@@ -49,7 +49,10 @@ Set `BIH_API_URL` to point the CLI at a different API address.
 - `GET /profile` / `PUT /profile` / `DELETE /profile/{key}` — personal details
   stored once and used to auto-fill paperwork
 - `GET /paperwork/templates` — built-in form templates (doctor visit summary,
-  medication list, benefits/disability answers, emergency card)
+  medication list, benefits/disability answers, emergency card) plus legal
+  paperwork letters (benefits appeal, formal complaint, records request,
+  adjustments request). Letters and information only — **never legal advice**;
+  every legal template points to free qualified help.
 - `POST /paperwork/fill` — fill a template (auto-fills from profile, reports
   what's still missing) and save the finished document
 - `GET /paperwork/documents` / `GET|DELETE /paperwork/documents/{id}` /
