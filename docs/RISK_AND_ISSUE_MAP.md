@@ -24,6 +24,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | P8 | Breaking API changes during Android development | 🟡 | 🛡️ | Pydantic models version responses; API versioned (v0.3.0); add `/v1/` prefix before public release. |
 | P9 | LLM provider outage once wired in | 🟠 | 📋 | Graceful fallback: cached supportive responses + all local features (notes/reminders/routines) keep working without AI. |
 | P10 | Memory leak / unclosed DB connections | 🟡 | ✅ | All connections scoped via `closing()` context manager per request. |
+| P12 | Calm mode ("too much") could mask a real crisis — user says "it's too much, I want to die" and gets grounding steps instead of crisis help | 🔴 | 🛡️ | Crisis detection runs in main.py BEFORE the assistant (incl. the overload intent) and always wins — enforced by test (test_calm.py). Calm steps are non-blocking and never replace the crisis reply. |
 
 ## 2. SECURITY ISSUES
 
@@ -55,6 +56,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | I5 | DB file created in unexpected location | ⚪ | 🛡️ | `BIH_DB_PATH` override documented; default is absolute path derived from the package, not cwd. |
 | I6 | Android build toolchain complexity (SDK, Gradle) | 🟡 | 🛡️ | Gradle/AGP versions pinned; CI build (GitHub Actions) compiles the app on every push/PR and caught 4 compile errors before any user saw them. |
 | I7 | Android 13+ blocks accessibility services for sideloaded APKs ("Restricted settings") | 🟠 | 📋 | User must allow it once: Settings → Apps → B.I.H. → ⋮ menu → "Allow restricted settings", then enable the service. Documented in apps/android/README.md. Gone once distributed via Play Store. |
+| I8 | APK update installs fail ("App not installed" / installer errors) | 🟠 | 🛡️ | Likely cause: each CI build signs with a FRESH debug key, so Android refuses to update over a differently-signed install. Fix for users: uninstall the old B.I.H. first (WARNING: wipes app data — Keystore-encrypted chat/profile), then install the new APK. Also check GitHub artifacts download as .zip — extract the .apk before tapping. Proper fix planned: pin a persistent upload key in CI secrets. Reported by user 2026-11-10. |
 
 ## 4. OPERATIONAL ISSUES
 
