@@ -91,8 +91,8 @@ fun AppNav(api: ApiClient, settings: SettingsStore) {
         },
     ) { padding ->
         NavHost(nav, startDestination = "chat", modifier = Modifier.padding(padding)) {
-            composable("chat") { ChatScreen(api) }
-            composable("today") { TodayScreen(api) }
+            composable("chat") { ChatScreen(api, onOpenCalm = { nav.navigate("calm") }) }
+            composable("today") { TodayScreen(api, onOpenCalm = { nav.navigate("calm") }) }
             composable("notes") { NotesScreen(api) }
             composable("routines") { RoutinesScreen(api) }
             composable("forms") { FormsScreen(api, onOpenSignature = { nav.navigate("signature") }) }
@@ -100,6 +100,7 @@ fun AppNav(api: ApiClient, settings: SettingsStore) {
             composable("signature") {
                 SignatureScreen(SignatureStore(nav.context), onBack = { nav.popBackStack() })
             }
+            composable("calm") { CalmScreen(api, onBack = { nav.popBackStack() }) }
         }
     }
 }

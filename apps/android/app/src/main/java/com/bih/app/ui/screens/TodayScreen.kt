@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 // "Today" answers one question: what do I need to do right now?
 // Shows unfinished reminders, then routine checklists.
 @Composable
-fun TodayScreen(api: ApiClient) {
+fun TodayScreen(api: ApiClient, onOpenCalm: () -> Unit) {
     var reminders by remember { mutableStateOf<List<Reminder>>(emptyList()) }
     var routines by remember { mutableStateOf<List<Routine>>(emptyList()) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -45,6 +45,14 @@ fun TodayScreen(api: ApiClient) {
 
     LazyColumn(Modifier.fillMaxSize().padding(16.dp)) {
         item { Text("Today", style = MaterialTheme.typography.titleLarge) }
+        item {
+            OutlinedButton(
+                onClick = onOpenCalm,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            ) {
+                Text("😮‍💨 Too much? Tap here")
+            }
+        }
         error?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
 
         item { Text("Reminders", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }
