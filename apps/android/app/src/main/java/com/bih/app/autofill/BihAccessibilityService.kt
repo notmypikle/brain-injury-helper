@@ -39,11 +39,14 @@ class BihAccessibilityService : AccessibilityService() {
 
     private var buttonCallback: AccessibilityButtonController.AccessibilityButtonCallback? = null
 
-    // The confirmation screen talks back to us through this broadcast.
+    // The confirmation screen talks back to us through this broadcast,
+    // returning the exact list the user reviewed.
     private val fillConfirmedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val includeSubmit = intent.getBooleanExtra(EXTRA_INCLUDE_SUBMIT, false)
-            performFill(includeSubmit)
+            val labels = intent.getStringArrayListExtra(EXTRA_CONFIRM_LABELS) ?: return
+            val values = intent.getStringArrayListExtra(EXTRA_CONFIRM_VALUES) ?: return
+            performFill(includeSubmit, labels.zip(values))
         }
     }
 
@@ -106,13 +109,15 @@ class BihAccessibilityService : AccessibilityService() {
     }
 
     // Step 2: only runs AFTER the user tapped "Fill" on the confirmation
-    // screen. We re-scan the screen fresh (it may have changed) and fill
-    // each recognised empty box.
-    private fun performFill(includeSubmit: Boolean) {
+    // screen. Security review fix (Nov 2026): we fill ONLY the boxes the
+    // user saw and confirmed — a hostile app can't sneak new boxes in while
+    // the confirmation screen is showing. The screen is re-scanned to find
+    // the live nodes, but every fill must match a confirmed label+value.
+    private fun performFill(includeSubmit: Boolean, confirmed: List<Pair<String, String>>) {
         val profile = SettingsStore(this).profileCache
         val root = rootInActiveWindow ?: return
         val matched = mutableListOf<Pair<AccessibilityNodeInfo, String>>()
-        collectNodes(root, profile, matched)
+        collectConfirmedNodes(root, profile, confirmed.toSet(), matched)
 
         matched.forEach { (node, value) ->
             val args = Bundle().apply {
@@ -144,8 +149,7 @@ class BihAccessibilityService : AccessibilityService() {
         profileKeyFor(node)?.let { key ->
             val value = profile[key]
             if (!value.isNullOrBlank() && node.text.isNullOrBlank()) {
-                val label = node.hintText?.toString()?.takeIf { it.isNotBlank() } ?: labelFor(key)
-                out.add(label to value)
+                out.add(labelForNode(node, key) to value)
             }
         }
         for (i in 0 until node.childCount) {
@@ -153,19 +157,26 @@ class BihAccessibilityService : AccessibilityService() {
         }
     }
 
-    private fun collectNodes(
+    private fun labelForNode(node: AccessibilityNodeInfo, key: String): String =
+        node.hintText?.toString()?.takeIf { it.isNotBlank() } ?: labelFor(key)
+
+    private fun collectConfirmedNodes(
         node: AccessibilityNodeInfo,
         profile: Map<String, String>,
+        confirmed: Set<Pair<String, String>>,
         out: MutableList<Pair<AccessibilityNodeInfo, String>>,
     ) {
         profileKeyFor(node)?.let { key ->
             val value = profile[key]
             if (!value.isNullOrBlank() && node.text.isNullOrBlank()) {
-                out.add(AccessibilityNodeInfo.obtain(node) to value)
+                val label = labelForNode(node, key)
+                if ((label to value) in confirmed) {
+                    out.add(AccessibilityNodeInfo.obtain(node) to value)
+                }
             }
         }
         for (i in 0 until node.childCount) {
-            node.getChild(i)?.let { collectNodes(it, profile, out) }
+            node.getChild(i)?.let { collectConfirmedNodes(it, profile, confirmed, out) }
         }
     }
 
@@ -231,5 +242,7 @@ class BihAccessibilityService : AccessibilityService() {
     companion object {
         const val ACTION_FILL_CONFIRMED = "com.bih.app.action.FILL_CONFIRMED"
         const val EXTRA_INCLUDE_SUBMIT = "com.bih.app.extra.INCLUDE_SUBMIT"
+        const val EXTRA_CONFIRM_LABELS = "com.bih.app.extra.CONFIRM_LABELS"
+        const val EXTRA_CONFIRM_VALUES = "com.bih.app.extra.CONFIRM_VALUES"
     }
 }

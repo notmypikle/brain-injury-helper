@@ -5,7 +5,9 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -85,6 +87,17 @@ fun ChatScreen(api: ApiClient) {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now — you can check the words before sending")
+            // Security review fix (Nov 2026): prefer ON-DEVICE speech
+            // recognition so dictated audio (which can include medical
+            // details) never leaves the phone.
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+        }
+        // If this device can't recognize speech on-device, say so before the
+        // user dictates — their audio may go to the recognizer's server.
+        if (Build.VERSION.SDK_INT >= 31 &&
+            !SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
+        ) {
+            notice = "Heads up: on this device, speech may be processed by the speech service online. Type instead if you prefer."
         }
         try {
             micLauncher.launch(intent)
