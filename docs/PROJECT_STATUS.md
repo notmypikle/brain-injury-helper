@@ -50,6 +50,16 @@ phone's main.py (fixed via git reset --hard origin/main).
   an in-the-moment "overload" helper (calm, one-step guidance when things
   get too loud/busy). Now feasible on-device (Pyannote 4.0 diarization,
   on-device separation), which fits the privacy model. Phase 5+.
+- **2026-11-10 — "Hey B.I.H." wake word** (like Gemini/Bixby): a true
+  always-listening wake word is not available to third-party apps
+  (phone-maker privilege) and would mean an always-on mic — against the
+  privacy model. Built the closest equivalents instead: B.I.H. can be set
+  as the DEFAULT ASSISTANT (hold-home / corner-swipe opens it from
+  anywhere, even closed) + a Quick Settings tile. If Android ever opens
+  wake words to third parties, revisit.
+- **2026-11-10 — First real-use bug report** (user testing!): chat wiped
+  on tab switch + blank page on open → fixed (app-level ChatState +
+  welcome message).
 - **2026-11-10 — Interested in:** AI security review of the code (like
   GPT-6 Cyber) and on-device AI via LiteRT/Gemini Nano for real chat
   answers. Security review DONE (see below); on-device AI chat queued.
