@@ -18,6 +18,7 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | P3 | Crisis regex false negatives (misspellings, other languages) | 🔴 | 🛡️ | Regex is a backstop only. Phase 3+ adds LLM-based detection layer. Never rely on regex alone; emergency button always visible in UI regardless. |
 | P4 | Crisis regex false positives (e.g. quoting a song lyric) | 🟡 | 🛡️ | Reply is caring but non-blocking — user can keep chatting. Acceptable tradeoff: over-trigger beats under-trigger. |
 | P5 | Speech recognition errors for users with speech impairments | 🔴 | 🛡️ | Mitigations built: text input always equally available; mic transcript lands in the text box for review before sending (never auto-sent). Still needs testing with real users in Phase 3 beta. |
+| P11 | Dictated audio could leave the device (default speech recognizer may be server-side), contradicting the privacy doc | 🟠 | ✅ | Found by security review 2026-11-10, fixed same day: mic requests on-device recognition (EXTRA_PREFER_OFFLINE) and warns the user first if the device can't do it. |
 | P6 | Dependency supply-chain break (package yanked/vulnerable) | 🟡 | ✅ | Versions pinned in requirements.txt. Re-run pip audit before releases; Dependabot on GitHub. |
 | P7 | Unbounded database growth (notes/reminders forever) | 🟡 | 📋 | Phase 4 export + user-controlled deletion already planned; add DB size to /health later. |
 | P8 | Breaking API changes during Android development | 🟡 | 🛡️ | Pydantic models version responses; API versioned (v0.3.0); add `/v1/` prefix before public release. |
