@@ -32,6 +32,21 @@ import java.util.Locale
 
 private data class Message(val text: String, val fromUser: Boolean, val isSafety: Boolean = false)
 
+// Bug fix (reported by user 2026-11-10): the chat lived inside the screen,
+// so switching tabs wiped it and reopening showed a blank page. ChatState
+// lives at app level, so the conversation survives tab switches for as
+// long as the app is running. (Saving history across app restarts is a
+// possible future feature.)
+private object ChatState {
+    val messages = mutableStateListOf<Message>()
+}
+
+private val WELCOME = Message(
+    "Hi, I'm here. 😊 Type below, or tap the mic to talk. " +
+        "Whatever's on your mind — we'll take it one step at a time.",
+    fromUser = false,
+)
+
 // Voice runs 100% on-device (docs/VOICE_AND_PRODUCTION.md Part 1):
 // - Mic uses Android's SpeechRecognizer; the transcript lands in the text
 //   box first so the user can check it before sending (risk P5).
@@ -39,13 +54,18 @@ private data class Message(val text: String, val fromUser: Boolean, val isSafety
 //   mutes/unmutes. Text input is always equally available.
 @Composable
 fun ChatScreen(api: ApiClient) {
-    val messages = remember { mutableStateListOf<Message>() }
+    val messages = ChatState.messages
     var input by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var notice by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val context = LocalContext.current
+
+    // Greet on a fresh/empty chat so the page never looks blank.
+    LaunchedEffect(Unit) {
+        if (messages.isEmpty()) messages.add(WELCOME)
+    }
 
     // --- Text-to-speech (spoken replies) ---
     var speakReplies by remember { mutableStateOf(true) }
