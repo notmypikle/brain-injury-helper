@@ -39,6 +39,9 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | S9 | Crisis-data liability (app detects crisis, user harmed anyway) | 🔴 | 🛡️ | Disclaimer in README: not a medical provider. Crisis reply directs to human help immediately. Legal review before public launch. |
 | S10 | Profile & paperwork documents concentrate PII/medical data (name, DOB, conditions, medications) | 🔴 | 🛡️ | Local-only storage, never sent to any LLM/cloud by default. Exported documents are plain text — warn users to store/share them carefully. Phase 4 encryption at rest (S3) covers these tables too. Field values are length-capped and keys whitelisted to a safe pattern. |
 | S11 | Autofill service could leak profile data into wrong app/website | 🟠 | 🛡️ | Built with conservative field matching; passwords/usernames/cards never touched; nothing fills without the confirmation screen showing every field+value; service reads only the local profile cache (no network); `onSaveRequest` ignored so nothing typed on sites is captured. Verify on a real device before release. |
+| S12 | Accessibility service can read/act on any screen (very powerful permission) | 🔴 | 🛡️ | User-requested (Nov 2026: cross-app help needed due to brain injury). Mitigations: opt-in only (user enables it in system settings); never monitors continuously — only reads the screen when the user taps the accessibility button; confirmation screen shows every field+value before filling; only fills EMPTY boxes; password fields excluded; no network calls in the service. Play Store requires an accessibility disclosure — B.I.H. qualifies as a genuine assistive app. |
+| S13 | Stored e-signature could be misused if stolen | 🟠 | 🛡️ | Signature strokes are encrypted with the Android Keystore (same as profile cache) and never uploaded. Typed "/s/ name" used for online signature boxes; drawn-signature PDF stamping is future work that will embed at export time only. |
+| S14 | Legal paperwork feature mistaken for legal advice (unauthorized practice of law; user relies on wrong info) | 🟠 | 🛡️ | User-requested (Nov 2026). Hard rule: B.I.H. provides LETTERS and plain-language information only, never case-specific advice. Every legal template carries "not legal advice" + points to free qualified help (enforced by a test). No jurisdiction-specific legal claims anywhere. Same pattern as the medical disclaimer. |
 
 ## 3. INSTALLATION ISSUES
 
@@ -49,7 +52,8 @@ Status: ✅ resolved · 🛡️ mitigated · 📋 planned · 👁️ monitored
 | I3 | Port 8000 already in use | ⚪ | 📋 | Document `--port` flag in README troubleshooting section. |
 | I4 | `uvicorn app.main:app` fails from wrong directory | ⚪ | 🛡️ | README shows `cd services/api` first; conftest.py handles path for tests. |
 | I5 | DB file created in unexpected location | ⚪ | 🛡️ | `BIH_DB_PATH` override documented; default is absolute path derived from the package, not cwd. |
-| I6 | Android build toolchain complexity (SDK, Gradle) | 🟡 | 📋 | Phase 2: pin Gradle/AGP versions, document exact setup steps, CI build to catch drift. |
+| I6 | Android build toolchain complexity (SDK, Gradle) | 🟡 | 🛡️ | Gradle/AGP versions pinned; CI build (GitHub Actions) compiles the app on every push/PR and caught 4 compile errors before any user saw them. |
+| I7 | Android 13+ blocks accessibility services for sideloaded APKs ("Restricted settings") | 🟠 | 📋 | User must allow it once: Settings → Apps → B.I.H. → ⋮ menu → "Allow restricted settings", then enable the service. Documented in apps/android/README.md. Gone once distributed via Play Store. |
 
 ## 4. OPERATIONAL ISSUES
 

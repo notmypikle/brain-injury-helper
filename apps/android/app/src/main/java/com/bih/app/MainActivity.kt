@@ -27,6 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.bih.app.data.ApiClient
 import com.bih.app.data.SettingsStore
+import com.bih.app.data.SignatureStore
 import com.bih.app.notifications.ReminderScheduler
 import com.bih.app.ui.screens.*
 import com.bih.app.ui.theme.BihTheme
@@ -94,8 +95,11 @@ fun AppNav(api: ApiClient, settings: SettingsStore) {
             composable("today") { TodayScreen(api) }
             composable("notes") { NotesScreen(api) }
             composable("routines") { RoutinesScreen(api) }
-            composable("forms") { FormsScreen(api) }
+            composable("forms") { FormsScreen(api, onOpenSignature = { nav.navigate("signature") }) }
             composable("settings") { SettingsScreen(settings) }
+            composable("signature") {
+                SignatureScreen(SignatureStore(nav.context), onBack = { nav.popBackStack() })
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ private val DETAIL_FIELDS = listOf(
 // The paperwork wizard. Three views in one screen, switched by [mode]:
 // list of forms + saved documents, filling one form, viewing one document.
 @Composable
-fun FormsScreen(api: ApiClient) {
+fun FormsScreen(api: ApiClient, onOpenSignature: () -> Unit = {}) {
     var profile by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var templates by remember { mutableStateOf<List<PaperworkTemplate>>(emptyList()) }
     var documents by remember { mutableStateOf<List<PaperworkDocument>>(emptyList()) }
@@ -90,6 +90,7 @@ fun FormsScreen(api: ApiClient) {
                     catch (e: ApiClient.ApiException) { error = e.message }
                 }
             },
+            onOpenSignature = onOpenSignature,
         )
     }
 }
@@ -104,6 +105,7 @@ private fun FormsList(
     onView: (PaperworkDocument) -> Unit,
     onDelete: (Int) -> Unit,
     onSaveProfile: (Map<String, String>) -> Unit,
+    onOpenSignature: () -> Unit,
 ) {
     var showDetails by remember { mutableStateOf(false) }
     // Editable copies of the profile fields.
@@ -121,13 +123,17 @@ private fun FormsList(
         }
 
         item {
-            TextButton(onClick = {
-                if (!showDetails) {
-                    edits.clear()
-                    DETAIL_FIELDS.forEach { (k, _) -> edits[k] = profile[k] ?: "" }
-                }
-                showDetails = !showDetails
-            }) { Text(if (showDetails) "Close My details" else "My details (auto-fill)") }
+            Row {
+                TextButton(onClick = {
+                    if (!showDetails) {
+                        edits.clear()
+                        DETAIL_FIELDS.forEach { (k, _) -> edits[k] = profile[k] ?: "" }
+                    }
+                    showDetails = !showDetails
+                }) { Text(if (showDetails) "Close My details" else "My details (auto-fill)") }
+                // User's e-signature idea: draw once, reuse for paperwork.
+                TextButton(onClick = onOpenSignature) { Text("My signature") }
+            }
         }
 
         if (showDetails) {

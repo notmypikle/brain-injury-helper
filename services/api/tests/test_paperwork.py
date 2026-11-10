@@ -44,6 +44,40 @@ def test_templates_listed(client):
     assert all(t["fields"] for t in r.json())
 
 
+def test_legal_letter_templates_listed(client):
+    """User-requested legal paperwork templates (Nov 2026)."""
+    ids = [t["id"] for t in client.get("/paperwork/templates").json()]
+    for expected in (
+        "benefits-appeal-letter",
+        "complaint-letter",
+        "records-request-letter",
+        "adjustments-request-letter",
+    ):
+        assert expected in ids
+
+
+def test_legal_templates_carry_no_advice_disclaimer(client):
+    """Every legal template must say it is not legal advice (risk S14)."""
+    templates = client.get("/paperwork/templates").json()
+    legal = [t for t in templates if t["id"].endswith("-letter")]
+    assert len(legal) >= 4
+    for t in legal:
+        assert "not legal advice" in t["description"].lower()
+
+
+def test_benefits_appeal_letter_fills_from_profile(client):
+    client.put("/profile", json={"fields": {"full_name": "Sam Lee", "address": "1 High St"}})
+    r = client.post("/paperwork/fill", json={
+        "template_id": "benefits-appeal-letter",
+        "values": {"what_disagree": "They refused my claim"},
+    })
+    assert r.status_code == 201
+    body = r.json()
+    assert body["content"].startswith("Sam Lee\n1 High St")
+    assert "They refused my claim" in body["content"]
+    assert "reference" in body["missing_fields"]  # still needs the letter's ref number
+
+
 def test_fill_autofills_from_profile_and_reports_missing(client):
     client.put("/profile", json={"fields": {"full_name": "Sam Lee", "dob": "1980-05-04"}})
     r = client.post("/paperwork/fill", json={
