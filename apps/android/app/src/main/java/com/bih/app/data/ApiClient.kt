@@ -66,6 +66,9 @@ class ApiClient(private val settings: SettingsStore) {
 
     suspend fun listNotes(): List<Note> = call("/notes") { json.decodeFromString(it) }
 
+    suspend fun getCalmSteps(): List<String> =
+        call("/calm/steps") { json.decodeFromString(CalmSteps.serializer(), it).steps }
+
     suspend fun addNote(text: String): Note =
         call("/notes", "POST", json.encodeToString(NoteIn.serializer(), NoteIn(text))) {
             json.decodeFromString(Note.serializer(), it)
