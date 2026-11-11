@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bih.app.data.ApiClient
+import com.bih.app.data.PaperworkChecklist
 import com.bih.app.data.PaperworkDocument
 import com.bih.app.data.PaperworkTemplate
 import kotlinx.coroutines.launch
@@ -41,6 +42,8 @@ fun FormsScreen(api: ApiClient, onOpenSignature: () -> Unit = {}) {
     var error by remember { mutableStateOf<String?>(null) }
     var filling by remember { mutableStateOf<PaperworkTemplate?>(null) }
     var viewing by remember { mutableStateOf<PaperworkDocument?>(null) }
+    var checklists by remember { mutableStateOf<List<PaperworkChecklist>>(emptyList()) }
+    var viewingChecklist by remember { mutableStateOf<PaperworkChecklist?>(null) }
     val scope = rememberCoroutineScope()
 
     fun refresh() {
@@ -49,6 +52,7 @@ fun FormsScreen(api: ApiClient, onOpenSignature: () -> Unit = {}) {
                 profile = api.getProfile()
                 templates = api.getTemplates()
                 documents = api.listDocuments()
+                checklists = api.getChecklists()
                 error = null
             } catch (e: ApiClient.ApiException) {
                 error = e.message
@@ -71,8 +75,12 @@ fun FormsScreen(api: ApiClient, onOpenSignature: () -> Unit = {}) {
             api = api,
         )
         viewing != null -> DocumentView(doc = viewing!!, onClose = { viewing = null })
+        viewingChecklist != null -> ChecklistView(
+            checklist = viewingChecklist!!, onClose = { viewingChecklist = null },
+        )
         else -> FormsList(
             templates = templates,
+            checklists = checklists,
             documents = documents,
             profile = profile,
             error = error,
@@ -91,6 +99,7 @@ fun FormsScreen(api: ApiClient, onOpenSignature: () -> Unit = {}) {
                 }
             },
             onOpenSignature = onOpenSignature,
+            onPickChecklist = { viewingChecklist = it },
         )
     }
 }
@@ -98,6 +107,7 @@ fun FormsScreen(api: ApiClient, onOpenSignature: () -> Unit = {}) {
 @Composable
 private fun FormsList(
     templates: List<PaperworkTemplate>,
+    checklists: List<PaperworkChecklist>,
     documents: List<PaperworkDocument>,
     profile: Map<String, String>,
     error: String?,
@@ -106,6 +116,7 @@ private fun FormsList(
     onDelete: (Int) -> Unit,
     onSaveProfile: (Map<String, String>) -> Unit,
     onOpenSignature: () -> Unit,
+    onPickChecklist: (PaperworkChecklist) -> Unit = {},
 ) {
     var showDetails by remember { mutableStateOf(false) }
     // Editable copies of the profile fields.
@@ -158,6 +169,29 @@ private fun FormsList(
                     }
                 }
             }
+        }
+
+        // "What form do I need, and what must I gather?" (2026-11-11)
+        item { Text("Which form? What to gather?", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }
+        items(checklists, key = { it.id }) { cl ->
+            Card(
+                Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                onClick = { onPickChecklist(cl) },
+            ) {
+                Column(Modifier.padding(12.dp)) {
+                    Text(cl.title, style = MaterialTheme.typography.titleSmall)
+                    Text("${cl.gathers.size} things to gather · tap to see",
+                         style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Text(
+                "Tip: save copies of your verification papers in the Notes tab " +
+                    "under a 'Verification documents' folder — everything in one place.",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp),
+            )
         }
 
         item { Text("Forms", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }
@@ -274,5 +308,28 @@ private fun DocumentView(doc: PaperworkDocument, onClose: () -> Unit) {
             }
         }
         Button(onClick = onClose, modifier = Modifier.padding(top = 8.dp)) { Text("Done") }
+    }
+}
+
+
+@Composable
+private fun ChecklistView(checklist: PaperworkChecklist, onClose: () -> Unit) {
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        Text(checklist.title, style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(12.dp))
+        LazyColumn(Modifier.weight(1f)) {
+            item { Text("The form to ask for:", style = MaterialTheme.typography.titleSmall) }
+            items(checklist.forms) { f -> Text("• $f", Modifier.padding(vertical = 2.dp)) }
+            item {
+                Spacer(Modifier.height(8.dp))
+                Text("Gather first:", style = MaterialTheme.typography.titleSmall)
+            }
+            items(checklist.gathers) { g -> Text("☐ $g", Modifier.padding(vertical = 2.dp)) }
+            item {
+                Spacer(Modifier.height(8.dp))
+                Text(checklist.note, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        OutlinedButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) { Text("Back") }
     }
 }

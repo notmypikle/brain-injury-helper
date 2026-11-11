@@ -30,6 +30,10 @@ LIST_DAY_RE = re.compile(
     r"\b(what'?s on|my reminders|to ?do|what do i need to do|my day)\b",
     re.IGNORECASE,
 )
+# Folder recall (2026-11-11): "what's in my Legal folder?"
+FOLDER_RE = re.compile(
+    r"\bwhat(?:'?s| is) in (?:my )?(?:the )?(\w[\w -]*?) folder\b", re.IGNORECASE,
+)
 NOTES_LIST_RE = re.compile(
     r"\b(my notes|read my notes|what did i ask you to remember|what have i saved)\b",
     re.IGNORECASE,
@@ -85,6 +89,7 @@ def respond(message: str, conn: sqlite3.Connection) -> str:
         _reminder_intent,
         _note_intent,
         _when_is_intent,
+        _folder_intent,
         _list_day_intent,
         _notes_list_intent,
         _routine_intent,
@@ -180,6 +185,23 @@ def _when_is_intent(message: str, conn: sqlite3.Connection) -> str | None:
         return f"Your {topic}: {_friendly_due(matches[0]['due_at'])}. I've got it noted. ✅"
     return (f"I don't have anything about \"{topic}\" yet. "
             f"Say \"remind me to …\" and I'll keep it for you.")
+
+
+def _folder_intent(message: str, conn: sqlite3.Connection) -> str | None:
+    """'What's in my Legal folder?' → list that folder's notes."""
+    m = FOLDER_RE.search(message)
+    if not m:
+        return None
+    folder = m.group(1).strip().lower()
+    matches = [n for n in db.list_notes(conn) if n["folder"].lower() == folder][:8]
+    if matches:
+        lines = [f"{i}. {n['text']}" for i, n in enumerate(matches, 1)]
+        return f"Your {m.group(1).strip()} folder:\n" + "\n".join(lines)
+    folders = db.list_note_folders(conn)
+    if folders:
+        names = ", ".join(folders)
+        return f"Nothing in \"{folder}\" yet. Your folders: {names}."
+    return "You don't have any folders yet. Save a note with a folder name and I'll file it."
 
 
 # --- Today / reminders overview -------------------------------------------

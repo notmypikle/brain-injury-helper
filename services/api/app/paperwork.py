@@ -254,6 +254,88 @@ TEMPLATES: list[dict] = [
 BLANK = "____________________"
 
 
+# --- Checklists (user request 2026-11-11): "B.I.H. needs to know what
+# forms are which and what is required on them, and have an area for
+# verification paperwork so everything is in one place." -------------
+# These tell the user WHICH form to ask an organization for and WHAT to
+# gather first. Generic by design — no legal advice (rule S14).
+
+CHECKLISTS: list[dict] = [
+    {
+        "id": "benefits-application",
+        "title": "Benefits / disability application",
+        "forms": ["The main benefit application (the office or its website names it)"],
+        "gathers": [
+            "Photo ID",
+            "Social Security / national insurance number",
+            "Medical records or a doctor's letter",
+            "Diagnosis / treatment history",
+            "Work history",
+            "Bank details (for payments)",
+            "Housing costs (rent statement or lease)",
+        ],
+        "note": "Save copies of everything in the Verification documents folder before submitting.",
+    },
+    {
+        "id": "benefits-appeal",
+        "title": "Benefits appeal",
+        "forms": ["The appeal form named in the decision letter"],
+        "gathers": [
+            "The decision letter itself",
+            "Any deadlines written in it (mark them as reminders!)",
+            "Medical evidence",
+            "Your dated incident/symptom notes",
+            "Statements from people who know your situation",
+        ],
+        "note": "Deadlines matter most — set a reminder the day the letter arrives.",
+    },
+    {
+        "id": "housing-support",
+        "title": "Housing / rent assistance",
+        "forms": ["The local housing program's application (the housing office names it)"],
+        "gathers": [
+            "Lease or rental agreement",
+            "Ledger of what you owe",
+            "Income proof",
+            "Any eviction or notice paperwork",
+            "Photo ID",
+        ],
+        "note": "Keep every notice you receive — dated paperwork wins cases.",
+    },
+    {
+        "id": "medical-records-request",
+        "title": "Medical records request",
+        "forms": ["The provider's records-release form (their office or patient portal has it)"],
+        "gathers": [
+            "Photo ID",
+            "Dates of treatment (approximate is fine)",
+            "Which records you need (visits, scans, notes)",
+            "Where records should be sent",
+        ],
+        "note": "You have a legal right to your own records. If refused, ask for the refusal in writing.",
+    },
+    {
+        "id": "identity-verification",
+        "title": "Identity verification",
+        "forms": ["The requesting organization's own form"],
+        "gathers": [
+            "Photo ID",
+            "Proof of address (utility bill, bank statement)",
+            "Birth certificate or Social Security card (only when required)",
+        ],
+        "note": "Share identity documents only through the organization's official site — check the web address carefully.",
+    },
+]
+
+
+def get_checklist(checklist_id: str) -> dict | None:
+    for c in CHECKLISTS:
+        if c["id"] == checklist_id:
+            return c
+    return None
+
+
+
 def get_template(template_id: str) -> dict | None:
     for t in TEMPLATES:
         if t["id"] == template_id:

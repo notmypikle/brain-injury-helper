@@ -117,11 +117,15 @@ def chat(req: ChatRequest):
         return ChatResponse(reply=assistant.respond(req.message, conn))
 
 
+def _valid_folder(folder: str) -> bool:
+    return bool(FOLDER_PATTERN.match(folder.strip()))
+
+
 @app.post("/notes", response_model=Note, status_code=201,
           dependencies=[Depends(require_api_key)])
 def create_note(note: NoteIn):
     folder = note.folder.strip()
-    if not FOLDER_PATTERN.match(folder):
+    if not _valid_folder(folder):
         raise HTTPException(
             status_code=422,
             detail="Folder names can use letters, numbers, spaces and - & ' , . only.",
@@ -143,6 +147,23 @@ def get_note_folders():
 def get_notes():
     with closing(db.connect()) as conn:
         return db.list_notes(conn)
+
+
+@app.put("/notes/{note_id}", response_model=Note,
+         dependencies=[Depends(require_api_key)])
+def edit_note(note_id: int, note: NoteIn):
+    """Edit a note's text/folder (user request 2026-11-11: press-and-hold
+    to edit, because notes get things wrong sometimes)."""
+    if not _valid_folder(note.folder):
+        raise HTTPException(
+            status_code=422,
+            detail="Folder names can use letters, numbers, spaces and - & ' , . only.",
+        )
+    with closing(db.connect()) as conn:
+        updated = db.update_note(conn, note_id, note.text, note.folder.strip())
+        if updated is None:
+            raise HTTPException(status_code=404, detail="Note not found")
+        return updated
 
 
 @app.delete("/notes/{note_id}", status_code=204,
@@ -209,6 +230,83 @@ def remove_reminder(reminder_id: int):
 
 
 # --- Routines (Phase 1) -----------------------------------------------------
+
+# Suggested steps for common routine names (user request 2026-11-11:
+# "B.I.H. should give suggestions based on a routine's name"). Generic,
+# fully editable — the user's version always wins once saved.
+ROUTINE_SUGGESTIONS: dict[str, list[str]] = {
+    "morning": [
+        "Sit up and take three slow breaths",
+        "Drink a glass of water",
+        "Take morning medication",
+        "Eat something small",
+        "Check today's reminders",
+    ],
+    "evening": [
+        "Take evening medication",
+        "Plug in the phone",
+        "Set out tomorrow's essentials (keys, wallet, bag)",
+        "Write tomorrow's top task as a note",
+        "Screens off or dimmed 30 minutes before bed",
+    ],
+    "bedtime": [
+        "Take evening medication",
+        "Brush teeth",
+        "Plug in the phone",
+        "Set out tomorrow's essentials (keys, wallet, bag)",
+        "Screens off or dimmed",
+    ],
+    "medication": [
+        "Check today's dose list",
+        "Take medication with water",
+        "Note anything unusual (dose, time, how you feel)",
+        "Check when the refill is due",
+    ],
+    "meds": [
+        "Check today's dose list",
+        "Take medication with water",
+        "Note anything unusual (dose, time, how you feel)",
+        "Check when the refill is due",
+    ],
+    "leaving": [
+        "Phone, keys, wallet",
+        "Windows and stove off/locked",
+        "Water bottle",
+        "Any documents needed for where you're going",
+    ],
+    "leaving home": [
+        "Phone, keys, wallet",
+        "Windows and stove off/locked",
+        "Water bottle",
+        "Any documents needed for where you're going",
+    ],
+    "appointment": [
+        "Confirm the date and time (check reminders)",
+        "Gather documents and ID",
+        "Write down the questions you want to ask",
+        "Plan the route and add travel time",
+        "Charge your phone",
+    ],
+}
+
+
+class RoutineSuggestion(BaseModel):
+    name: str
+    steps: list[str]
+    matched: bool
+
+
+@app.get("/routines/suggest", response_model=RoutineSuggestion,
+         dependencies=[Depends(require_api_key)])
+def suggest_routine(name: str):
+    steps = ROUTINE_SUGGESTIONS.get(name.strip().lower())
+    if steps is None:
+        return RoutineSuggestion(
+            name=name, matched=False,
+            steps=["Start with the first small step", "Add more steps as you go"],
+        )
+    return RoutineSuggestion(name=name, steps=steps, matched=True)
+
 
 @app.post("/routines", response_model=Routine, status_code=201,
           dependencies=[Depends(require_api_key)])
@@ -287,6 +385,22 @@ class TemplateField(BaseModel):
     key: str
     label: str
     auto: bool
+
+
+class PaperworkChecklist(BaseModel):
+    id: str
+    title: str
+    forms: list[str]
+    gathers: list[str]
+    note: str
+
+
+@app.get("/paperwork/checklists", response_model=list[PaperworkChecklist],
+         dependencies=[Depends(require_api_key)])
+def list_checklists():
+    """'Which form do I need, and what must I gather first?' (user request
+    2026-11-11). Generic guidance only — never legal advice (rule S14)."""
+    return paperwork.CHECKLISTS
 
 
 class PaperworkTemplate(BaseModel):
