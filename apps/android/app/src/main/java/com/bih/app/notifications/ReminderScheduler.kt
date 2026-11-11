@@ -21,13 +21,30 @@ import java.util.concurrent.TimeUnit
 // All work happens on the device — reminders never leave the phone.
 object ReminderScheduler {
 
-    const val CHANNEL_ID = "reminders"
+    // Channel sound is locked once created — v0.1.16 migrates to a new
+    // channel so reminders RING (user test 2026-11-11: the notification
+    // popped up silently because the phone's notification sound was off;
+    // alarm audio plays even then).
+    const val CHANNEL_ID = "reminders-alarm"
     private const val WORK_PREFIX = "reminder-"
 
     fun ensureChannel(context: Context) {
         val channel = NotificationChannel(
             CHANNEL_ID, "Reminders", NotificationManager.IMPORTANCE_HIGH,
-        ).apply { description = "Due reminders from B.I.H." }
+        ).apply {
+            description = "Due reminders from B.I.H."
+            // Ring even when notification volume is down: alarm audio +
+            // vibration, so a reminder can actually wake/remind.
+            setSound(
+                android.media.RingtoneManager.getDefaultUri(
+                    android.media.RingtoneManager.TYPE_ALARM,
+                ),
+                android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                    .build(),
+            )
+            enableVibration(true)
+        }
         context.getSystemService(NotificationManager::class.java)
             ?.createNotificationChannel(channel)
     }
