@@ -175,8 +175,8 @@ private fun FormsList(
         item { Text("Which form? What to gather?", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }
         items(checklists, key = { it.id }) { cl ->
             Card(
-                Modifier.fillMaxWidth().padding(vertical = 4.dp),
                 onClick = { onPickChecklist(cl) },
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             ) {
                 Column(Modifier.padding(12.dp)) {
                     Text(cl.title, style = MaterialTheme.typography.titleSmall)
