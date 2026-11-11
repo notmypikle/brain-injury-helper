@@ -57,9 +57,15 @@ phone's main.py (fixed via git reset --hard origin/main).
   and devices. Keep in mind the high functionality of J.A.R.V.I.S."
   (An earlier J.A.R.V.I.S. attempt lived only in a Copilot chat that
   became read-only — another reason everything now lives in this repo.)
+  **Full capability map: docs/JARVIS_VISION.md.**
   Every feature should move toward: voice-first, works across all apps,
   fills forms, reads and explains anything, remembers everything —
   while staying private and on-device.
+- **2026-11-11 — Reminder form 422 + alarm trust** (real use, day one):
+  typing "6:30 p.m." was rejected (form demanded ISO 8601) → reminders
+  now accept friendly times; "not sure an alarm will go off" → exact
+  AlarmManager alarms when granted (+ Today-screen nudge card), and
+  chat-created reminders schedule alarms immediately. PR #26, v0.1.10.
 - **2026-11-11 — Save sections into folders of my choosing** (reading a
   document/chat, pause on a section, save just that section into a
   folder): notes have folders (API + migration for existing phones,
