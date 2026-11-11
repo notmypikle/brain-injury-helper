@@ -220,6 +220,18 @@ all fixed same day:**
 Everything else checked clean (auth coverage, SQL, template injection,
 Keystore encryption, exported components, DoS limits).
 
+## Session 2026-11-11 evening (ongoing)
+User is mid-update to v0.1.16. Evening wins: target-employer list
+researched + saved (career/target-employers.md in the PRIVATE
+ai-companion-app repo — career docs must never live in the public
+B.I.H. repo); read lens (PR #31); content-first reading (PR #32);
+alarm-audio reminders (PR #33) — user VERIFIED the reminder fired
+on time on-device. LinkedIn post decision: user posts only when
+the app works exactly how they want. Still open from earlier:
+assistant-gesture default (user must pick B.I.H. in Settings →
+Apps → Default apps → Digital assistant app — Google Lens holds
+that slot today).
+
 ## Session paused 2026-11-11 ~03:05 UTC
 User on a break, may return tonight. Everything below is current. The
 ONE parked action: the user installs v0.1.11 (4-step dance — NOTE:
