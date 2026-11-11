@@ -92,7 +92,7 @@ def _reminder_intent(message: str, conn: sqlite3.Connection) -> str | None:
             'For example: "in 30 minutes" or "at 6 pm".'
         )
     db.add_reminder(conn, task, due.strftime("%Y-%m-%dT%H:%M"))
-    return f"Done! I'll remind you to {task} — {due:%d %b at %H:%M}."
+    return f"Done! I'll remind you to {task} — {_friendly_time(due)}."
 
 
 def _extract_time(text: str) -> tuple[datetime | None, str]:
@@ -175,9 +175,15 @@ def _list_day_intent(message: str, conn: sqlite3.Connection) -> str | None:
     return "Here's what's coming up:\n" + "\n".join(lines)
 
 
+def _friendly_time(due: datetime) -> str:
+    """12-hour clock with am/pm — user feedback 2026-11-11: 24-hour
+    'military' time is harder to read (accessibility)."""
+    return due.strftime("%d %b at ") + due.strftime("%I:%M %p").lstrip("0").lower()
+
+
 def _friendly_due(due_at: str) -> str:
     try:
-        return datetime.fromisoformat(due_at).strftime("%d %b %H:%M")
+        return _friendly_time(datetime.fromisoformat(due_at))
     except ValueError:
         return due_at
 
