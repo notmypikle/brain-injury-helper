@@ -84,6 +84,7 @@ All data is stored locally in SQLite (`bih.db` by default; override with
 endpoint except `/health`.
 
 ## Docs
+- `docs/PHONE_SETUP.md` — install and run everything on a phone, no computer
 - `docs/VOICE_AND_PRODUCTION.md` — voice architecture + concept→production roadmap
 - `docs/MONETIZATION.md` — ethical pricing tiers and revenue plan
 - `docs/RISK_AND_ISSUE_MAP.md` — every known/theoretical issue + resolutions
