@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The read lens overlay: a visible frame the user drags over a
+     paragraph, with three buttons. Big touch targets, high contrast. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/lens_frame"
+    android:padding="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/lens_drag_handle"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="✥ drag me over the text"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/lens_confirm"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:text="✔️"
+            android:textSize="18sp"
+            android:contentDescription="Read what's under the lens" />
+
+        <Button
+            android:id="@+id/lens_fullscreen"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:text="🔍"
+            android:layout_marginStart="6dp"
+            android:textSize="18sp"
+            android:contentDescription="Read the whole screen instead" />
+
+        <Button
+            android:id="@+id/lens_cancel"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:text="✖️"
+            android:layout_marginStart="6dp"
+            android:textSize="18sp"
+            android:contentDescription="Close the lens" />
+    </LinearLayout>
+
+    <!-- The see-through part: the user aims this at the text. -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

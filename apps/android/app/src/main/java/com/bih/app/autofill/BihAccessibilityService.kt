@@ -38,6 +38,14 @@ import java.util.Locale
 class BihAccessibilityService : AccessibilityService() {
 
     private var buttonCallback: AccessibilityButtonController.AccessibilityButtonCallback? = null
+    private val lens = LensController(this)
+
+    // The lens's 🔍 button asks for the whole-screen flow via this bridge.
+    private val fullscreenReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            proposeHelp()
+        }
+    }
 
     // The confirmation screen talks back to us through this broadcast,
     // returning the exact list the user reviewed.
@@ -56,6 +64,19 @@ class BihAccessibilityService : AccessibilityService() {
             IntentFilter(ACTION_FILL_CONFIRMED),
             ContextCompat.RECEIVER_NOT_EXPORTED,
         )
+        ContextCompat.registerReceiver(
+            this, fullscreenReceiver,
+            IntentFilter(ACTION_FULLSCREEN_PICK),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        ContextCompat.registerReceiver(
+            this,
+            object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) = lens.show()
+            },
+            IntentFilter(ACTION_SHOW_LENS),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
         // The system accessibility button (a small floating button the user
         // can enable in Android settings) triggers our "fill this screen".
         val cb = object : AccessibilityButtonController.AccessibilityButtonCallback() {
@@ -70,6 +91,7 @@ class BihAccessibilityService : AccessibilityService() {
     override fun onUnbind(intent: Intent?): Boolean {
         buttonCallback?.let { accessibilityButtonController.unregisterAccessibilityButtonCallback(it) }
         buttonCallback = null
+        lens.hide()
         return super.onUnbind(intent)
     }
 
@@ -268,6 +290,8 @@ class BihAccessibilityService : AccessibilityService() {
         const val EXTRA_INCLUDE_SUBMIT = "com.bih.app.extra.INCLUDE_SUBMIT"
         const val EXTRA_CONFIRM_LABELS = "com.bih.app.extra.CONFIRM_LABELS"
         const val EXTRA_CONFIRM_VALUES = "com.bih.app.extra.CONFIRM_VALUES"
+        const val ACTION_FULLSCREEN_PICK = "com.bih.app.action.FULLSCREEN_PICK"
+        const val ACTION_SHOW_LENS = "com.bih.app.action.SHOW_LENS"
         private const val MAX_SCREEN_TEXT = 20000 // ~10 pages: documents can be a lot (user, 2026-11-11)
     }
 }
