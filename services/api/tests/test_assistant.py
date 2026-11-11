@@ -56,7 +56,7 @@ def test_whats_on_lists_reminders(client):
 def test_when_is_looks_up_reminder(client):
     chat(client, "remind me about the dentist at 9 am")
     reply = chat(client, "when is my dentist?")
-    assert "09:00" in reply
+    assert "9:00 am" in reply
 
 
 def test_remember_that_saves_note(client):
@@ -95,3 +95,10 @@ def test_voice_uses_assistant(client):
     r = client.post("/voice", json={"transcript": "what time is my appointment"})
     assert r.status_code == 200
     assert "appointment" in r.json()["reply_text"]
+
+
+def test_times_use_12_hour_clock(client):
+    # User feedback 2026-11-11: 24-hour "military" time is hard to read.
+    reply = chat(client, "remind me to take meds at 6 pm")
+    assert "6:00 pm" in reply
+    assert "18:00" not in reply
