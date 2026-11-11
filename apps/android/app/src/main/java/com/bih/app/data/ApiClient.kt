@@ -69,10 +69,12 @@ class ApiClient(private val settings: SettingsStore) {
     suspend fun getCalmSteps(): List<String> =
         call("/calm/steps") { json.decodeFromString(CalmSteps.serializer(), it).steps }
 
-    suspend fun addNote(text: String): Note =
-        call("/notes", "POST", json.encodeToString(NoteIn.serializer(), NoteIn(text))) {
+    suspend fun addNote(text: String, folder: String = ""): Note =
+        call("/notes", "POST", json.encodeToString(NoteIn.serializer(), NoteIn(text, folder))) {
             json.decodeFromString(Note.serializer(), it)
         }
+
+    suspend fun listNoteFolders(): List<String> = call("/notes/folders") { json.decodeFromString(it) }
 
     suspend fun deleteNote(id: Int): Unit = call("/notes/$id", "DELETE") { }
 
