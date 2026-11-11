@@ -95,6 +95,11 @@ phone's main.py (fixed via git reset --hard origin/main).
 - **Published B.I.H. v0.1.3 to the `apk` branch** (built from CI run
   42922012521, PR #18 merge): real local assistant + hardened chat
   persistence. The direct download now has the assistant build.
+- **Default API address fixed (PR #20, merged; v0.1.5 on the `apk`
+  branch):** fresh installs pointed at the emulator address (10.0.2.2) —
+  the user hit this after their reinstall. Now defaults to
+  `http://127.0.0.1:8000` (API in Termux on the same phone). No action
+  needed on the user's current install (address already saved).
 - Session start: read this file, ran the tests (40 passing at the time),
   answered the user's APK install question ("app not found" — likely
   artifact-zip or per-build debug signature; see risk I8).
