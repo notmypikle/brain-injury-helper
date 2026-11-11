@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.bih.app.data.ApiClient
 import com.bih.app.data.KeystoreCipher
+import com.bih.app.notifications.ReminderScheduler
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -177,6 +178,10 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
                 val resp = api.chat(text)
                 messages.add(Message(resp.reply, fromUser = false, isSafety = resp.safety_flag))
                 speak(resp.reply)
+                // Chat can create reminders — keep their alarms in step
+                // right away, not just when the Today tab opens.
+                try { ReminderScheduler.scheduleAll(context, api.listReminders()) }
+                catch (e: Exception) { /* the Today tab refreshes them too */ }
             } catch (e: ApiClient.ApiException) {
                 messages.add(Message(e.message ?: "Something went wrong.", fromUser = false))
             }

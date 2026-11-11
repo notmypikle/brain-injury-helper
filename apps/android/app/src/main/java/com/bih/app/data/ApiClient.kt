@@ -48,6 +48,13 @@ class ApiClient(private val settings: SettingsStore) {
                 when {
                     resp.code == 401 -> throw ApiException("Wrong or missing API key. Check Settings.")
                     resp.code == 404 -> throw ApiException("That item was not found.")
+                    // Validation errors carry a friendly explanation from
+                    // the API (e.g. how to write a time) — show THAT.
+                    resp.code == 422 -> throw ApiException(
+                        runCatching {
+                            json.parseToJsonElement(text).jsonObject["detail"]?.jsonPrimitive?.content
+                        }.getOrNull() ?: "That didn't look right — check what you typed.",
+                    )
                     !resp.isSuccessful -> throw ApiException("The helper had a problem (code ${resp.code}).")
                     else -> parse(text)
                 }

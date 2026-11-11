@@ -59,6 +59,25 @@ AT_TIME_RE = re.compile(r"\bat (\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b", re.IGNORECA
 TOMORROW_RE = re.compile(r"\btomorrow\b", re.IGNORECASE)
 
 
+def parse_due(text: str) -> datetime | None:
+    """Friendly times for the reminder form (user hit a 422 typing
+    '6:30 p.m.' on 2026-11-11 — nobody should have to type ISO 8601).
+    Accepts '6 pm', '6:30 p.m.', '18:00', 'in 30 minutes', 'tomorrow
+    at 9 am'. Returns None when anything is left over we don't
+    understand — better to ask than to guess the wrong time."""
+    t = text.strip()
+    if not t:
+        return None
+    t = re.sub(r"(?i)\b([ap])\.m\.", r"\1m", t)  # p.m. → pm
+    # Reuse the assistant's time engine; a bare '6 pm' parses as 'at 6 pm'.
+    if not re.match(r"(?i)^(in |at |tomorrow|today)", t):
+        t = f"at {t}"
+    due, leftover = _extract_time(t)
+    if due is None or leftover.strip(" ,.-"):
+        return None
+    return due
+
+
 def respond(message: str, conn: sqlite3.Connection) -> str:
     """Turn a user message into a helpful reply, using local features."""
     for handler in (
