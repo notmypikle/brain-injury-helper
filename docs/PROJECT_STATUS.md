@@ -14,7 +14,7 @@ uvicorn with the new code. Follow-up user feedback, both shipped in
 v0.1.6 (PRs #21 + #22): "no way to delete chat messages" → Clear chat
 button (trash icon + confirm dialog); "it's on military time" → replies
 now say "6:00 pm" instead of "18:00" (47 API tests passing).
-Pending: user installs v0.1.9 (adds the GREEN theme — brain-injury awareness color, PR #25; on top of v0.1.8 reader play/pause/back/next/repeat,
+Pending: user installs v0.1.11 (50k notes / 20k capture, PR #28; on top of v0.1.9–10) (adds the GREEN theme — brain-injury awareness color, PR #25; on top of v0.1.8 reader play/pause/back/next/repeat,
 tap-to-jump, save-section-to-folders on top of v0.1.7) + git pull +
 phone restart. Accessibility service ENABLEMENT confirmed working on the
 a Samsung phone (restricted-settings path; risk I7 workaround verified).
@@ -204,6 +204,16 @@ all fixed same day:**
    added.
 Everything else checked clean (auth coverage, SQL, template injection,
 Keystore encryption, exported components, DoS limits).
+
+## Session paused 2026-11-11 ~03:05 UTC
+User on a break, may return tonight. Everything below is current. The
+ONE parked action: the user installs v0.1.11 (4-step dance: git pull in
+Termux → uninstall old app → install from apk branch → restart phone),
+then taps "Allow exact alarms" on the Today card. VPN split-tunneling
+is set up and verified. New tonight (all merged): v0.1.10 friendly
+reminder times + exact alarms; v0.1.11 big-note wiggle room; note cap
+fix (PR #27); JARVIS_VISION.md created; smart home/cast permanently
+OFF (risk S16 — real-world cast/mirroring abuse exists; cast features stay off unless requested).
 
 ## Where we left off / next steps (in order)
 1. ✅ DONE 2026-11-10: app installed on the user's phone, API running in
