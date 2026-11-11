@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
@@ -86,6 +87,7 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
     var input by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var notice by remember { mutableStateOf<String?>(null) }
+    var showClearConfirm by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val context = LocalContext.current
@@ -187,11 +189,38 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         // Core accessibility need (2026-11-10): one tap out of overload,
         // always visible at the top of the chat.
-        OutlinedButton(
-            onClick = onOpenCalm,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-        ) {
-            Text("😮‍💨 Too much? Tap here")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedButton(
+                onClick = onOpenCalm,
+                modifier = Modifier.weight(1f).padding(bottom = 8.dp),
+            ) {
+                Text("😮‍💨 Too much? Tap here")
+            }
+            // User request (2026-11-11): a way to delete chat messages.
+            IconButton(
+                onClick = { showClearConfirm = true },
+                modifier = Modifier.padding(bottom = 8.dp),
+            ) {
+                Icon(Icons.Filled.Delete, contentDescription = "Clear chat")
+            }
+        }
+        if (showClearConfirm) {
+            AlertDialog(
+                onDismissRequest = { showClearConfirm = false },
+                title = { Text("Clear chat?") },
+                text = { Text("This deletes every message in this chat. It can't be undone.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        messages.clear()
+                        messages.add(WELCOME)
+                        ChatState.save()
+                        showClearConfirm = false
+                    }) { Text("Delete all") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showClearConfirm = false }) { Text("Keep") }
+                },
+            )
         }
         LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
             items(messages) { msg ->
