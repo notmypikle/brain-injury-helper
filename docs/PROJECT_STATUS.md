@@ -66,6 +66,15 @@ phone's main.py (fixed via git reset --hard origin/main).
   now accept friendly times; "not sure an alarm will go off" → exact
   AlarmManager alarms when granted (+ Today-screen nudge card), and
   chat-created reminders schedule alarms immediately. PR #26, v0.1.10.
+- **2026-11-11 — Round-2 real-use batch (PR #30, v0.1.13):**
+  press-and-hold to EDIT notes (PUT /notes/{id}); chat MULTI-DELETE
+  (long-press → select → Delete selected / Keep only these — "all or
+  nothing won't cut it, I lose my train of thought"); "what's in my X
+  folder?" recall; paperwork CHECKLISTS (which form + what to gather —
+  generic, never legal advice, S14); routine-name step SUGGESTIONS.
+  Deferred by design: auto-uploading verification documents (user's tap
+  required — attack vector), hardcoded state laws (stale law hurts the
+  users it claims to help; on-device AI live lookup is the safe path).
 - **2026-11-11 — Save sections into folders of my choosing** (reading a
   document/chat, pause on a section, save just that section into a
   folder): notes have folders (API + migration for existing phones,
