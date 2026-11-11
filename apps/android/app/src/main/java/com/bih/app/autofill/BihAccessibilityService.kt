@@ -60,7 +60,7 @@ class BihAccessibilityService : AccessibilityService() {
         // can enable in Android settings) triggers our "fill this screen".
         val cb = object : AccessibilityButtonController.AccessibilityButtonCallback() {
             override fun onClicked(controller: AccessibilityButtonController) {
-                proposeFill()
+                proposeHelp()
             }
         }
         buttonCallback = cb
@@ -76,36 +76,60 @@ class BihAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
     override fun onInterrupt() = Unit
 
-    // Step 1: look at the current screen, find empty boxes we recognise,
-    // and ask the user to review before anything happens.
-    private fun proposeFill() {
-        val profile = SettingsStore(this).profileCache
-        if (profile.isEmpty()) {
-            toast("First add your details in B.I.H. → Forms → My details")
-            return
-        }
+    // Step 1: look at the current screen ONCE, then offer the user the
+    // things we can do with it (read it / fill it) — one simple choice.
+    // User request 2026-11-11: "can it read what's on the screen when I
+    // need it to, for help understanding texts, emails and documents?"
+    private fun proposeHelp() {
         val root = rootInActiveWindow
         if (root == null) {
             toast("Nothing on screen to read")
             return
         }
+        val screenText = collectScreenText(root)
+        val profile = SettingsStore(this).profileCache
         val matches = mutableListOf<Pair<String, String>>() // label -> value
-        collectMatches(root, profile, matches)
+        if (profile.isNotEmpty()) {
+            collectMatches(root, profile, matches)
+        }
         val hasSubmit = findSubmit(root) != null
         root.recycle()
 
-        if (matches.isEmpty()) {
-            toast("No empty boxes I recognise on this screen")
+        if (screenText.isBlank() && matches.isEmpty()) {
+            toast("Nothing readable on this screen")
             return
         }
         startActivity(
-            ScreenFillConfirmationActivity.buildIntent(
+            AssistMenuActivity.buildIntent(
                 this,
+                screenText,
                 ArrayList(matches.map { it.first }),
                 ArrayList(matches.map { it.second }),
                 hasSubmit,
             ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
         )
+    }
+
+    // Gather the screen's visible text, in reading order, de-duplicated.
+    // Password fields are NEVER read (same safety rulebook as filling).
+    private fun collectScreenText(root: AccessibilityNodeInfo): String {
+        val parts = LinkedHashSet<String>()
+        collectText(root, parts)
+        var text = parts.joinToString("\n")
+        if (text.length > MAX_SCREEN_TEXT) {
+            text = text.take(MAX_SCREEN_TEXT) + "\n… (screen text shortened)"
+        }
+        return text
+    }
+
+    private fun collectText(node: AccessibilityNodeInfo, out: MutableSet<String>) {
+        if (!node.isPassword) {
+            node.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }?.let(out::add)
+            node.contentDescription?.toString()?.trim()?.takeIf { it.isNotEmpty() }?.let(out::add)
+        }
+        for (i in 0 until node.childCount) {
+            node.getChild(i)?.let { collectText(it, out) }
+        }
     }
 
     // Step 2: only runs AFTER the user tapped "Fill" on the confirmation
@@ -244,5 +268,6 @@ class BihAccessibilityService : AccessibilityService() {
         const val EXTRA_INCLUDE_SUBMIT = "com.bih.app.extra.INCLUDE_SUBMIT"
         const val EXTRA_CONFIRM_LABELS = "com.bih.app.extra.CONFIRM_LABELS"
         const val EXTRA_CONFIRM_VALUES = "com.bih.app.extra.CONFIRM_VALUES"
+        private const val MAX_SCREEN_TEXT = 8000
     }
 }
