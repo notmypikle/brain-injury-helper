@@ -144,3 +144,21 @@ def test_api_key_required_when_configured(client, monkeypatch):
     assert r.status_code == 200
     # Health check stays open for uptime monitors
     assert client.get("/health").status_code == 200
+
+
+def test_reminder_accepts_friendly_times(client):
+    # User feedback 2026-11-11: typing "6:30 p.m." got a 422. Never again.
+    r = client.post("/reminders", json={"text": "meds", "due_at": "6 pm"})
+    assert r.status_code == 201 and r.json()["due_at"].endswith("T18:00")
+    r = client.post("/reminders", json={"text": "meds", "due_at": "6:30 p.m."})
+    assert r.status_code == 201 and r.json()["due_at"].endswith("T18:30")
+    r = client.post("/reminders", json={"text": "stretch", "due_at": "in 30 minutes"})
+    assert r.status_code == 201
+    r = client.post("/reminders", json={"text": "bins", "due_at": "tomorrow at 9 am"})
+    assert r.status_code == 201 and r.json()["due_at"].endswith("T09:00")
+
+
+def test_friendly_time_error_message_is_helpful(client):
+    r = client.post("/reminders", json={"text": "x", "due_at": "blorp"})
+    assert r.status_code == 422
+    assert "6 pm" in r.json()["detail"]  # shows examples, not programmer-speak

@@ -4,6 +4,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Reminders must fire ON TIME (a late meds reminder is a failed
+         reminder). On Android 13+ the user grants this in system settings;
+         the Today screen shows a nudge card until they do. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!-- Required by ContextCompat.registerReceiver(RECEIVER_NOT_EXPORTED)
          on Android 8–12 — without this the accessibility service crashes
@@ -38,6 +42,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- Fires exact-time reminder notifications. -->
+        <receiver
+            android:name=".notifications.ReminderAlarmReceiver"
+            android:exported="false" />
 
         <!-- Quick Settings tile: swipe down from the top of any screen,
              tap B.I.H., app opens. -->
