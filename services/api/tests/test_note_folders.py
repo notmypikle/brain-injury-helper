@@ -76,5 +76,11 @@ def test_whole_screen_capture_fits_in_a_note(client):
 
 
 def test_notes_still_have_a_sane_limit(client):
-    r = client.post("/notes", json={"text": "x" * 10001})
+    r = client.post("/notes", json={"text": "x" * 50001})
     assert r.status_code == 422
+
+
+def test_documentation_sized_note_saves(client):
+    # Heavy record-keeping use (2026-11-11): ~20k chars, foldered.
+    r = client.post("/notes", json={"text": "entry " * 3500, "folder": "Documentation"})
+    assert r.status_code == 201

@@ -268,6 +268,6 @@ class BihAccessibilityService : AccessibilityService() {
         const val EXTRA_INCLUDE_SUBMIT = "com.bih.app.extra.INCLUDE_SUBMIT"
         const val EXTRA_CONFIRM_LABELS = "com.bih.app.extra.CONFIRM_LABELS"
         const val EXTRA_CONFIRM_VALUES = "com.bih.app.extra.CONFIRM_VALUES"
-        private const val MAX_SCREEN_TEXT = 8000
+        private const val MAX_SCREEN_TEXT = 20000 // ~10 pages: documents can be a lot (user, 2026-11-11)
     }
 }
