@@ -73,8 +73,9 @@ class Note(BaseModel):
 
 class ReminderIn(BaseModel):
     text: str = Field(min_length=1, max_length=1000)
-    # ISO 8601 datetime, e.g. "2026-11-02T09:00"
-    due_at: str = Field(min_length=10, max_length=40)
+    # ISO 8601 or friendly words ("6 pm", "in 30 minutes") — _parse_due_at
+    # validates, so the model itself stays permissive.
+    due_at: str = Field(min_length=1, max_length=40)
 
 
 class Reminder(BaseModel):
@@ -150,25 +151,32 @@ def remove_note(note_id: int):
 
 # --- Reminders (Phase 1) ----------------------------------------------------
 
-def _validate_due_at(due_at: str) -> None:
-    """Risk P2: due_at must be ISO 8601. An explicit UTC offset
-    (e.g. "2026-11-02T09:00+00:00") is preferred; naive values are
-    accepted and treated as the user's local time."""
+def _parse_due_at(due_at: str) -> str:
+    """Accept ISO 8601 (preferred: explicit UTC offset, naive treated as
+    local time — risk P2) OR friendly words like '6 pm' / 'in 30 minutes'
+    (user feedback 2026-11-11: raw ISO caused a 422 in real use).
+    Returns the normalized naive-local ISO string."""
     try:
         datetime.fromisoformat(due_at)
+        return due_at
     except ValueError:
+        pass
+    friendly = assistant.parse_due(due_at)
+    if friendly is None:
         raise HTTPException(
             status_code=422,
-            detail="due_at must be ISO 8601, e.g. 2026-11-02T09:00+00:00",
+            detail="I didn't understand that time. Try \"6 pm\", "
+                   "\"in 30 minutes\", \"tomorrow 9 am\", or 2026-11-11T18:00.",
         )
+    return friendly.strftime("%Y-%m-%dT%H:%M")
 
 
 @app.post("/reminders", response_model=Reminder, status_code=201,
           dependencies=[Depends(require_api_key)])
 def create_reminder(reminder: ReminderIn):
-    _validate_due_at(reminder.due_at)
+    normalized = _parse_due_at(reminder.due_at)
     with closing(db.connect()) as conn:
-        return db.add_reminder(conn, reminder.text, reminder.due_at)
+        return db.add_reminder(conn, reminder.text, normalized)
 
 
 @app.get("/reminders", response_model=list[Reminder],

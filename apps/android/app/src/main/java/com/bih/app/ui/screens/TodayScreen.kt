@@ -8,6 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
 import com.bih.app.data.ApiClient
 import com.bih.app.data.Reminder
 import com.bih.app.data.Routine
@@ -55,6 +58,33 @@ fun TodayScreen(api: ApiClient, onOpenCalm: () -> Unit) {
         }
         error?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
 
+        // User worry (2026-11-11): "not sure an alarm will actually go
+        // off." Without the exact-alarm grant Android may DELAY
+        // notifications — say so and offer the one-tap fix.
+        if (!ReminderScheduler.exactAlarmsAllowed(context)) {
+            item {
+                Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            "Reminders might arrive late ⏰",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text("Allow exact alarms so they fire right on time.")
+                        Button(
+                            onClick = {
+                                if (Build.VERSION.SDK_INT >= 31) {
+                                    context.startActivity(
+                                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM),
+                                    )
+                                }
+                            },
+                            modifier = Modifier.padding(top = 8.dp),
+                        ) { Text("Allow exact alarms") }
+                    }
+                }
+            }
+        }
+
         item { Text("Reminders", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp)) }
 
         // Add a reminder: what, and when (ISO 8601 — the API validates it).
@@ -70,7 +100,7 @@ fun TodayScreen(api: ApiClient, onOpenCalm: () -> Unit) {
                     OutlinedTextField(
                         value = newDue,
                         onValueChange = { newDue = it },
-                        label = { Text("When? e.g. 2026-11-03T09:00") },
+                        label = { Text("When? e.g. 6 pm, in 30 minutes, tomorrow 9 am") },
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     )
                     Button(
