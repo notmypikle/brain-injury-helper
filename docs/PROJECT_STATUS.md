@@ -14,7 +14,10 @@ uvicorn with the new code. Follow-up user feedback, both shipped in
 v0.1.6 (PRs #21 + #22): "no way to delete chat messages" → Clear chat
 button (trash icon + confirm dialog); "it's on military time" → replies
 now say "6:00 pm" instead of "18:00" (47 API tests passing).
-Pending: user installs v0.1.7 (adds Read-this-screen on top of v0.1.6) + git pull + phone restart.
+Pending: user installs v0.1.8 (adds reader play/pause/back/next/repeat,
+tap-to-jump, save-section-to-folders on top of v0.1.7) + git pull +
+phone restart. Accessibility service ENABLEMENT confirmed working on the
+user's Galaxy (restricted-settings path; risk I7 workaround verified).
 
 ## 🏆 Milestone: CALM MODE ON THE USER'S PHONE (2026-11-11)
 v0.1.4 installed (the "App not installed" blocker was fixed by
@@ -47,6 +50,22 @@ phone's main.py (fixed via git reset --hard origin/main).
 | Calm mode ("Too much" button) | ✅ On device | v0.1.4 installed 2026-11-11; user verified the Calm screen: "perfect" |
 
 ## User ideas log (things the user asked for — keep building on these)
+- **⭐ NORTH STAR (2026-11-11) — J.A.R.V.I.S. from Iron Man.** The whole
+  app's origin, in the user's words: "I said to myself, if I had
+  something like that on my phone, things would be a whole lot easier to
+  fill out forms and everything else that needs to be done on our phones
+  and devices. Keep in mind the high functionality of J.A.R.V.I.S."
+  (An earlier J.A.R.V.I.S. attempt lived only in a Copilot chat that
+  became read-only — another reason everything now lives in this repo.)
+  Every feature should move toward: voice-first, works across all apps,
+  fills forms, reads and explains anything, remembers everything —
+  while staying private and on-device.
+- **2026-11-11 — Save sections into folders of my choosing** (reading a
+  document/chat, pause on a section, save just that section into a
+  folder): notes have folders (API + migration for existing phones,
+  validated names, GET /notes/folders); the read screen's save dialog
+  offers folder chips + "Save this section" / "Save whole screen";
+  Notes tab shows 📁 folders. PR #24, v0.1.8.
 - **2026-11-02 — Cross-app integration + e-signature** (user's words: needs
   it because of the brain injury): view whatever is on screen, fill it with
   saved private details, e-sign. Built as: BihAccessibilityService
