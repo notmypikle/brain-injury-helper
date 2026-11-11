@@ -5,6 +5,17 @@ every work session so the next session can pick up without re-discovery.*
 
 Last updated: 2026-11-11
 
+## 🏆 Milestone: ASSISTANT BRAIN VERIFIED ON DEVICE (2026-11-11)
+The phrase test PASSED: "remind me to drink water in 30 minutes" got a
+real assistant reply (no more echo). Root cause of the earlier echo: the
+phone's repo was stuck on the stale `feature/ai-upgrade` branch — fixed
+with `git checkout main && git pull`, then a phone restart reloaded
+uvicorn with the new code. Follow-up user feedback, both shipped in
+v0.1.6 (PRs #21 + #22): "no way to delete chat messages" → Clear chat
+button (trash icon + confirm dialog); "it's on military time" → replies
+now say "6:00 pm" instead of "18:00" (47 API tests passing).
+Pending: user installs v0.1.6 + git pull + phone restart.
+
 ## 🏆 Milestone: CALM MODE ON THE USER'S PHONE (2026-11-11)
 v0.1.4 installed (the "App not installed" blocker was fixed by
 uninstalling the old app first — risk I8's documented workaround,
@@ -44,6 +55,13 @@ phone's main.py (fixed via git reset --hard origin/main).
   signature boxes. Risks S12/S13/I7 added to the risk map.
 - **2026-11-02 — Online document auto-fill** (both wizard + direct fill):
   paperwork wizard (merged) + autofill service (merged).
+- **2026-11-11 — "No way to delete the last chat messages"** (found in
+  real use): added a Clear chat button (trash icon beside "Too much",
+  confirm dialog → wipes the encrypted history, greets fresh). PR #21,
+  v0.1.6. Privacy/control need — supports S8.
+- **2026-11-11 — "It's on military time"**: 24-hour times are harder to
+  read (accessibility). Assistant replies now use 12-hour am/pm
+  ("6:00 pm"). PR #22, v0.1.6.
 - **2026-11-10 — Legal paperwork help** (a real need: "there's always
   legal paperwork when dealing with life as a human"): 4 letter templates
   added to the wizard — benefits appeal, formal complaint, records request
