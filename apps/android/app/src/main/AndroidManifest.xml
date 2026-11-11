@@ -83,6 +83,19 @@
             android:excludeFromRecents="true"
             android:theme="@style/Theme.BIH" />
 
+        <!-- The accessibility button's chooser + the big-text reader.
+             Not reachable from other apps; never leave the recents list. -->
+        <activity
+            android:name=".autofill.AssistMenuActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.BIH" />
+        <activity
+            android:name=".autofill.ReadScreenActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.BIH" />
+
         <service
             android:name=".autofill.BihAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
