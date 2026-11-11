@@ -23,6 +23,7 @@ class AssistMenuActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val screenText = intent.getStringExtra(EXTRA_SCREEN_TEXT).orEmpty()
+        val contentText = intent.getStringExtra(EXTRA_CONTENT_TEXT).orEmpty()
         val labels = intent.getStringArrayListExtra(EXTRA_LABELS) ?: arrayListOf()
         val values = intent.getStringArrayListExtra(EXTRA_VALUES) ?: arrayListOf()
         val hasSubmit = intent.getBooleanExtra(EXTRA_HAS_SUBMIT, false)
@@ -94,6 +95,7 @@ class AssistMenuActivity : ComponentActivity() {
 
     companion object {
         private const val EXTRA_SCREEN_TEXT = "bih.extra.SCREEN_TEXT"
+        private const val EXTRA_CONTENT_TEXT = "bih.extra.CONTENT_TEXT"
         private const val EXTRA_LABELS = "bih.extra.MENU_LABELS"
         private const val EXTRA_VALUES = "bih.extra.MENU_VALUES"
         private const val EXTRA_HAS_SUBMIT = "bih.extra.MENU_HAS_SUBMIT"
@@ -101,11 +103,13 @@ class AssistMenuActivity : ComponentActivity() {
         fun buildIntent(
             context: Context,
             screenText: String,
+            contentText: String,
             labels: ArrayList<String>,
             values: ArrayList<String>,
             hasSubmit: Boolean,
         ): Intent = Intent(context, AssistMenuActivity::class.java).apply {
             putExtra(EXTRA_SCREEN_TEXT, screenText)
+            putExtra(EXTRA_CONTENT_TEXT, contentText)
             putStringArrayListExtra(EXTRA_LABELS, labels)
             putStringArrayListExtra(EXTRA_VALUES, values)
             putExtra(EXTRA_HAS_SUBMIT, hasSubmit)

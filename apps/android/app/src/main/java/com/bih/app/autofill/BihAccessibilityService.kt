@@ -109,6 +109,7 @@ class BihAccessibilityService : AccessibilityService() {
             return
         }
         val screenText = collectScreenText(root)
+        val contentText = collectContentText(root)
         val profile = SettingsStore(this).profileCache
         val matches = mutableListOf<Pair<String, String>>() // label -> value
         if (profile.isNotEmpty()) {
@@ -125,6 +126,7 @@ class BihAccessibilityService : AccessibilityService() {
             AssistMenuActivity.buildIntent(
                 this,
                 screenText,
+                contentText,
                 ArrayList(matches.map { it.first }),
                 ArrayList(matches.map { it.second }),
                 hasSubmit,
@@ -143,6 +145,43 @@ class BihAccessibilityService : AccessibilityService() {
         }
         return text
     }
+
+    // Content-first reading (user feedback 2026-11-11): "I don't want all
+    // the header and footer details too." Same screen scan, but chrome —
+    // toolbars, nav labels, app bars — is skipped so the reader starts
+    // with the actual content.
+    private fun collectContentText(root: AccessibilityNodeInfo): String {
+        val parts = LinkedHashSet<String>()
+        collectTextFiltered(root, parts)
+        var text = parts.joinToString("\n")
+        if (text.length > MAX_SCREEN_TEXT) {
+            text = text.take(MAX_SCREEN_TEXT) + "\n… (screen text shortened)"
+        }
+        return text
+    }
+
+    private fun collectTextFiltered(node: AccessibilityNodeInfo, out: MutableSet<String>) {
+        if (node.isPassword) return
+        if (isChrome(node)) return // whole subtree is header/footer/nav junk
+        node.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+            ?.takeIf { !isNavLabel(it) }?.let(out::add)
+        node.contentDescription?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+            ?.takeIf { !isNavLabel(it) }?.let(out::add)
+        for (i in 0 until node.childCount) {
+            node.getChild(i)?.let { collectTextFiltered(it, out) }
+        }
+    }
+
+    // Toolbars, app bars and action menus are chrome — skip the subtree.
+    private fun isChrome(node: AccessibilityNodeInfo): Boolean {
+        val cls = node.className?.toString().orEmpty()
+        return cls.contains("Toolbar") || cls.contains("AppBarLayout") ||
+            cls.contains("BottomNavigation") || cls.contains("TabLayout")
+    }
+
+    // Bare nav words that add noise, not content ("Home", "Back", "Menu").
+    private fun isNavLabel(text: String): Boolean =
+        text.length <= 12 && text.lowercase(java.util.Locale.US) in NAV_LABELS
 
     private fun collectText(node: AccessibilityNodeInfo, out: MutableSet<String>) {
         if (!node.isPassword) {
@@ -292,6 +331,11 @@ class BihAccessibilityService : AccessibilityService() {
         const val EXTRA_CONFIRM_VALUES = "com.bih.app.extra.CONFIRM_VALUES"
         const val ACTION_FULLSCREEN_PICK = "com.bih.app.action.FULLSCREEN_PICK"
         const val ACTION_SHOW_LENS = "com.bih.app.action.SHOW_LENS"
+        private val NAV_LABELS = setOf(
+            "home", "back", "menu", "close", "settings", "more", "search",
+            "share", "edit", "done", "next", "previous", "cancel", "ok",
+            "up", "open drawer", "more options", "navigate up",
+        )
         private const val MAX_SCREEN_TEXT = 20000 // ~10 pages: documents can be a lot (user, 2026-11-11)
     }
 }
