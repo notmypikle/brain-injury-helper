@@ -206,8 +206,10 @@ Keystore encryption, exported components, DoS limits).
 
 ## Session paused 2026-11-11 ~03:05 UTC
 User on a break, may return tonight. Everything below is current. The
-ONE parked action: the user installs v0.1.11 (4-step dance: git pull in
-Termux → uninstall old app → install from apk branch → restart phone),
+ONE parked action: the user installs v0.1.11 (4-step dance — NOTE:
+history was rewritten for privacy 2026-11-11, so the Termux step is now
+cd ~/brain-injury-helper && git fetch origin && git reset --hard origin/main
+(plain git pull will fail — histories differ) → uninstall old app → install from apk branch → restart phone),
 then taps "Allow exact alarms" on the Today card. VPN split-tunneling
 is set up and verified. New tonight (all merged): v0.1.10 friendly
 reminder times + exact alarms; v0.1.11 big-note wiggle room; note cap
