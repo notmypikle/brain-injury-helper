@@ -66,6 +66,13 @@ phone's main.py (fixed via git reset --hard origin/main).
   now accept friendly times; "not sure an alarm will go off" → exact
   AlarmManager alarms when granted (+ Today-screen nudge card), and
   chat-created reminders schedule alarms immediately. PR #26, v0.1.10.
+- **2026-11-11 — Reading upgrades + alarm audio (PRs #31–33,
+  v0.1.14–16, all verified live on the user's phone):** read LENS
+  (draggable frame reads only the paragraph it covers — "magnifying
+  accessory"); content-first reading (headers/footers/nav filtered;
+  "Read everything" stays one tap away); reminder notifications RING
+  with alarm audio + vibration (user test: popped up on time but
+  silently when notification sound was off).
 - **2026-11-11 — Round-2 real-use batch (PR #30, v0.1.13):**
   press-and-hold to EDIT notes (PUT /notes/{id}); chat MULTI-DELETE
   (long-press → select → Delete selected / Keep only these — "all or
