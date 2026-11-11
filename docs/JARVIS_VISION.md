@@ -38,7 +38,7 @@ Status: ✅ shipped · 🔨 built, testing · 🗺️ planned · ⛔ blocked/con
 | Tell voices apart | Party scenes | 🗺️ Phase 5+ | On-device diarization (Pyannote) — who-said-what conversation notes |
 | Dry humor & personality | "Sir, I'm going to have to ask you to exit the donut." | 🗺️ | Warmth yes, sass carefully — calm and clarity first for our users |
 | Control the house/suit | Lab, suit deployment | 🗺️ | Phone-level: open apps, start calls, toggle flashlight — via intents, always confirmed |
-| Manage the smart home | Mansion lighting, security | 🗺️ | Later: on-device-friendly smart-home bridge (e.g. Home Assistant on the same phone/network) — privacy review first |
+| Manage the smart home | Mansion lighting, security | ⛔ OFF per user decision (2026-11-11): cast/mirroring abuse vector (risk S16) — no smart-home or cast features, ever, unless the user explicitly asks | n/a |
 | Real-time tactical support | Live data mid-mission | 🗺️ | In-the-moment help during appointments/forms: the overload helper + "what does this mean?" while it's on screen |
 | Strategic advice | Battle scenario analysis | 🗺️ | "Help me think this through" — pros/cons walkthroughs, one small step at a time (needs on-device LLM) |
 | Remote-control many suits at once | Coordinated suit fleets | 🗺️ | Multi-device (phone + tablet) — would need end-to-end-encrypted sync; big privacy decision, user decides |
