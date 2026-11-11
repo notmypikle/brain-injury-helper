@@ -16,8 +16,8 @@ button (trash icon + confirm dialog); "it's on military time" → replies
 now say "6:00 pm" instead of "18:00" (47 API tests passing).
 Pending: user installs v0.1.11 (50k notes / 20k capture, PR #28; on top of v0.1.9–10) (adds the GREEN theme — brain-injury awareness color, PR #25; on top of v0.1.8 reader play/pause/back/next/repeat,
 tap-to-jump, save-section-to-folders on top of v0.1.7) + git pull +
-phone restart. Accessibility service ENABLEMENT confirmed working on the
-a Samsung phone (restricted-settings path; risk I7 workaround verified).
+phone restart. Accessibility service ENABLEMENT confirmed working on a
+Samsung phone (restricted-settings path; risk I7 workaround verified).
 
 ## 🏆 Milestone: CALM MODE ON THE USER'S PHONE (2026-11-11)
 v0.1.4 installed (the "App not installed" blocker was fixed by
@@ -72,8 +72,8 @@ phone's main.py (fixed via git reset --hard origin/main).
   validated names, GET /notes/folders); the read screen's save dialog
   offers folder chips + "Save this section" / "Save whole screen";
   Notes tab shows 📁 folders. PR #24, v0.1.8.
-- **2026-11-02 — Cross-app integration + e-signature** (user's words: needs
-  it as a core need): view whatever is on screen, fill it with
+- **2026-11-02 — Cross-app integration + e-signature** (a core need for
+  our users): view whatever is on screen, fill it with
   saved private details, e-sign. Built as: BihAccessibilityService
   (screen fill with confirmation, optional Send/Submit tap) + draw-with-
   finger signature pad (encrypted, on-device only) + typed e-signature in
@@ -101,10 +101,9 @@ phone's main.py (fixed via git reset --hard origin/main).
   (subject access), adjustments request. Hard rule: letters and
   information only, NEVER legal advice; every template says so and points
   to free qualified help (risk S14, enforced by a test).
-- **2026-11-10 — Voice separation / "who said what"** (user saw an article
-  on AI separating overlapping voices; real-world feedback: noise + too much
-  simultaneous stimulation is a genuine daily barrier — treat as a CORE
-  accessibility need, not a nice-to-have): future features — conversation
+- **2026-11-10 — Voice separation / "who said what"** (noise and too much
+  simultaneous stimulation are genuine daily barriers for our users —
+  treat as a CORE accessibility need, not a nice-to-have): future features — conversation
   notes that transcribe WHO said WHAT (memory support after group
   conversations or appointments), focus-one-voice listening, and possibly
   an in-the-moment "overload" helper (calm, one-step guidance when things
@@ -213,7 +212,8 @@ then taps "Allow exact alarms" on the Today card. VPN split-tunneling
 is set up and verified. New tonight (all merged): v0.1.10 friendly
 reminder times + exact alarms; v0.1.11 big-note wiggle room; note cap
 fix (PR #27); JARVIS_VISION.md created; smart home/cast permanently
-OFF (risk S16 — real-world cast/mirroring abuse exists; cast features stay off unless requested).
+OFF (risk S16 — real-world cast/mirroring abuse exists; cast features
+stay off unless explicitly requested).
 
 ## Where we left off / next steps (in order)
 1. ✅ DONE 2026-11-10: app installed on the user's phone, API running in

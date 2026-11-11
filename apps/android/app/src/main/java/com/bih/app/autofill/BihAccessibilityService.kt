@@ -15,9 +15,9 @@ import com.bih.app.data.SettingsStore
 import java.util.Locale
 
 // ---------------------------------------------------------------------------
-// USER'S IDEA (Nov 2026): "I need cross-app integration because of my brain
-// injury — a way to view whatever is on screen and interact with it: fill
-// out what's on the page with my private details, or send a message."
+// USER NEED (Nov 2026): cross-app help — view whatever is on screen and
+// interact with it: fill out what's on the page with saved private
+// details, or send a message. A core accessibility need for our users.
 //
 // This is the Android Accessibility Service that makes it possible. It can
 // see any app's screen and act on it — the same Android mechanism TalkBack
