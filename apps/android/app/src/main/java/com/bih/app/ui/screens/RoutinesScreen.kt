@@ -50,6 +50,18 @@ fun RoutinesScreen(api: ApiClient) {
                             label = { Text("Routine name") },
                             modifier = Modifier.fillMaxWidth(),
                         )
+                        // Suggested steps from the name (user request
+                        // 2026-11-11) — editable before saving.
+                        TextButton(onClick = {
+                            scope.launch {
+                                try {
+                                    val s = api.getRoutineSuggestion(name)
+                                    if (s.matched && s.steps.isNotEmpty()) {
+                                        stepsText = s.steps.joinToString("\n")
+                                    }
+                                } catch (e: ApiClient.ApiException) { /* optional help */ }
+                            }
+                        }, enabled = name.isNotBlank()) { Text("✨ Suggest steps") }
                         OutlinedTextField(
                             value = stepsText,
                             onValueChange = { stepsText = it },

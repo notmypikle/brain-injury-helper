@@ -98,6 +98,19 @@ def list_notes(conn: sqlite3.Connection) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def update_note(
+    conn: sqlite3.Connection, note_id: int, text: str, folder: str
+) -> dict | None:
+    cur = conn.execute(
+        "UPDATE notes SET text = ?, folder = ? WHERE id = ?",
+        (text, folder, note_id),
+    )
+    conn.commit()
+    if cur.rowcount == 0:
+        return None
+    return get_note(conn, note_id)
+
+
 def list_note_folders(conn: sqlite3.Connection) -> list[str]:
     rows = conn.execute(
         "SELECT DISTINCT folder FROM notes WHERE folder != '' ORDER BY folder"

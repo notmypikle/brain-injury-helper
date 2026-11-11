@@ -83,6 +83,11 @@ class ApiClient(private val settings: SettingsStore) {
 
     suspend fun listNoteFolders(): List<String> = call("/notes/folders") { json.decodeFromString(it) }
 
+    suspend fun editNote(id: Int, text: String, folder: String): Note =
+        call("/notes/$id", "PUT", json.encodeToString(NoteIn.serializer(), NoteIn(text, folder))) {
+            json.decodeFromString(Note.serializer(), it)
+        }
+
     suspend fun deleteNote(id: Int): Unit = call("/notes/$id", "DELETE") { }
 
     suspend fun listReminders(): List<Reminder> = call("/reminders") { json.decodeFromString(it) }
@@ -122,6 +127,14 @@ class ApiClient(private val settings: SettingsStore) {
 
     suspend fun getTemplates(): List<PaperworkTemplate> =
         call("/paperwork/templates") { json.decodeFromString(it) }
+
+    suspend fun getChecklists(): List<PaperworkChecklist> =
+        call("/paperwork/checklists") { json.decodeFromString(it) }
+
+    suspend fun getRoutineSuggestion(name: String): RoutineSuggestion =
+        call("/routines/suggest?name=" + java.net.URLEncoder.encode(name, "UTF-8")) {
+            json.decodeFromString(RoutineSuggestion.serializer(), it)
+        }
 
     suspend fun fillPaperwork(templateId: String, values: Map<String, String>): PaperworkDocument =
         call(

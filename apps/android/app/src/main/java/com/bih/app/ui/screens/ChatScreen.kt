@@ -13,6 +13,8 @@ import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -82,6 +84,7 @@ private val WELCOME = Message(
 //   box first so the user can check it before sending (risk P5).
 // - Replies are spoken with the device's TextToSpeech. The speaker button
 //   mutes/unmutes. Text input is always equally available.
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
     val messages = ChatState.messages
@@ -89,6 +92,10 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
     var busy by remember { mutableStateOf(false) }
     var notice by remember { mutableStateOf<String?>(null) }
     var showClearConfirm by remember { mutableStateOf(false) }
+    // User request 2026-11-11: delete SOME messages, not all-or-nothing.
+    // Losing a train of thought is costly — surgical cleanup matters.
+    var selectMode by remember { mutableStateOf(false) }
+    val selected = remember { mutableStateListOf<Int>() }
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val context = LocalContext.current
@@ -209,6 +216,26 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
                 Icon(Icons.Filled.Delete, contentDescription = "Clear chat")
             }
         }
+        if (selectMode) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("${selected.size} selected", Modifier.weight(1f))
+                TextButton(onClick = {
+                    // Delete chosen messages, keep the rest (order kept).
+                    val remaining = messages.filterIndexed { i, _ -> i !in selected }
+                    messages.clear(); messages.addAll(remaining)
+                    ChatState.save()
+                    selectMode = false
+                }, enabled = selected.isNotEmpty()) { Text("Delete selected") }
+                TextButton(onClick = {
+                    // Keep only the chosen ones — the important ones stay.
+                    val kept = messages.filterIndexed { i, _ -> i in selected }
+                    messages.clear(); messages.addAll(kept)
+                    ChatState.save()
+                    selectMode = false
+                }, enabled = selected.isNotEmpty()) { Text("Keep only these") }
+                TextButton(onClick = { selectMode = false; selected.clear() }) { Text("Cancel") }
+            }
+        }
         if (showClearConfirm) {
             AlertDialog(
                 onDismissRequest = { showClearConfirm = false },
@@ -228,8 +255,10 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
             )
         }
         LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-            items(messages) { msg ->
+            items(messages.size) { i ->
+                val msg = messages[i]
                 val bg = when {
+                    selectMode && i in selected -> MaterialTheme.colorScheme.tertiaryContainer
                     msg.isSafety -> MaterialTheme.colorScheme.errorContainer
                     msg.fromUser -> MaterialTheme.colorScheme.primaryContainer
                     else -> MaterialTheme.colorScheme.surfaceVariant
@@ -239,9 +268,23 @@ fun ChatScreen(api: ApiClient, onOpenCalm: () -> Unit) {
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 4.dp)
+                        .combinedClickable(
+                            onClick = {
+                                if (selectMode) {
+                                    if (i in selected) selected.remove(i) else selected.add(i)
+                                }
+                            },
+                            onLongClick = {
+                                selectMode = true
+                                if (i !in selected) selected.add(i)
+                            },
+                        ),
                 ) {
-                    Text(msg.text, Modifier.padding(12.dp))
+                    Text(
+                        (if (selectMode && i in selected) "✔️ " else "") + msg.text,
+                        Modifier.padding(12.dp),
+                    )
                 }
             }
         }

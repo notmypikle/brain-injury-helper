@@ -46,6 +46,18 @@ data class ProfileUpdate(val fields: Map<String, String>)
 data class TemplateField(val key: String, val label: String, val auto: Boolean)
 
 @Serializable
+data class PaperworkChecklist(
+    val id: String,
+    val title: String,
+    val forms: List<String>,
+    val gathers: List<String>,
+    val note: String,
+)
+
+@Serializable
+data class RoutineSuggestion(val name: String, val steps: List<String>, val matched: Boolean)
+
+@Serializable
 data class PaperworkTemplate(
     val id: String,
     val title: String,
