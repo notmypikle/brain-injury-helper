@@ -60,7 +60,10 @@ FOLDER_PATTERN = re.compile(r"^[\w \-&',.]{0,60}$")
 
 
 class NoteIn(BaseModel):
-    text: str = Field(min_length=1, max_length=4000)
+    # Sized to fit a whole captured screen (reader caps at 8000) plus the
+    # "Read from screen:" prefix — user hit a 422 saving a full page
+    # (2026-11-11). Still bounded for DoS safety.
+    text: str = Field(min_length=1, max_length=10000)
     folder: str = Field(default="", max_length=60)
 
 
