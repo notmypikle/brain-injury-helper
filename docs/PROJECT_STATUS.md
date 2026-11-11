@@ -14,7 +14,7 @@ uvicorn with the new code. Follow-up user feedback, both shipped in
 v0.1.6 (PRs #21 + #22): "no way to delete chat messages" → Clear chat
 button (trash icon + confirm dialog); "it's on military time" → replies
 now say "6:00 pm" instead of "18:00" (47 API tests passing).
-Pending: user installs v0.1.8 (adds reader play/pause/back/next/repeat,
+Pending: user installs v0.1.9 (adds the GREEN theme — brain-injury awareness color, PR #25; on top of v0.1.8 reader play/pause/back/next/repeat,
 tap-to-jump, save-section-to-folders on top of v0.1.7) + git pull +
 phone restart. Accessibility service ENABLEMENT confirmed working on the
 user's Galaxy (restricted-settings path; risk I7 workaround verified).
