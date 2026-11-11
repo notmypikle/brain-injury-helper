@@ -56,6 +56,13 @@ fun NotesScreen(api: ApiClient) {
                 Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                     Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
+                            if (note.folder.isNotBlank()) {
+                                Text(
+                                    "📁 ${note.folder}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
                             Text(note.text)
                             Text(note.created_at, style = MaterialTheme.typography.bodyMedium)
                         }

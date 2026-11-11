@@ -14,10 +14,10 @@ data class ChatResponse(val reply: String, val safety_flag: Boolean = false)
 data class CalmSteps(val steps: List<String>)
 
 @Serializable
-data class NoteIn(val text: String)
+data class NoteIn(val text: String, val folder: String = "")
 
 @Serializable
-data class Note(val id: Int, val text: String, val created_at: String)
+data class Note(val id: Int, val text: String, val folder: String = "", val created_at: String)
 
 @Serializable
 data class ReminderIn(val text: String, val due_at: String)
