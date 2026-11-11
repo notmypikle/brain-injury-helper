@@ -61,27 +61,48 @@ def connect(path: Path | None = None) -> sqlite3.Connection:
     # WAL mode: extra crash safety if power is lost mid-write (risk O2).
     conn.execute("PRAGMA journal_mode=WAL")
     conn.executescript(SCHEMA)
+    _migrate(conn)
     return conn
 
 
-def add_note(conn: sqlite3.Connection, text: str) -> dict:
-    cur = conn.execute("INSERT INTO notes (text) VALUES (?)", (text,))
+def _migrate(conn: sqlite3.Connection) -> None:
+    """In-place upgrades for existing databases (CREATE TABLE IF NOT EXISTS
+    can't add columns to a table that already exists on the user's phone)."""
+    # 2026-11-11: user-chosen folders for notes ("save that section in a
+    # folder of my choosing").
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(notes)").fetchall()]
+    if "folder" not in cols:
+        conn.execute("ALTER TABLE notes ADD COLUMN folder TEXT NOT NULL DEFAULT ''")
+        conn.commit()
+
+
+def add_note(conn: sqlite3.Connection, text: str, folder: str = "") -> dict:
+    cur = conn.execute(
+        "INSERT INTO notes (text, folder) VALUES (?, ?)", (text, folder)
+    )
     conn.commit()
     return get_note(conn, cur.lastrowid)
 
 
 def get_note(conn: sqlite3.Connection, note_id: int) -> dict | None:
     row = conn.execute(
-        "SELECT id, text, created_at FROM notes WHERE id = ?", (note_id,)
+        "SELECT id, text, folder, created_at FROM notes WHERE id = ?", (note_id,)
     ).fetchone()
     return dict(row) if row else None
 
 
 def list_notes(conn: sqlite3.Connection) -> list[dict]:
     rows = conn.execute(
-        "SELECT id, text, created_at FROM notes ORDER BY id DESC"
+        "SELECT id, text, folder, created_at FROM notes ORDER BY id DESC"
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+def list_note_folders(conn: sqlite3.Connection) -> list[str]:
+    rows = conn.execute(
+        "SELECT DISTINCT folder FROM notes WHERE folder != '' ORDER BY folder"
+    ).fetchall()
+    return [r["folder"] for r in rows]
 
 
 def delete_note(conn: sqlite3.Connection, note_id: int) -> bool:
