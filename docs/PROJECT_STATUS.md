@@ -14,7 +14,7 @@ uvicorn with the new code. Follow-up user feedback, both shipped in
 v0.1.6 (PRs #21 + #22): "no way to delete chat messages" → Clear chat
 button (trash icon + confirm dialog); "it's on military time" → replies
 now say "6:00 pm" instead of "18:00" (47 API tests passing).
-Pending: user installs v0.1.6 + git pull + phone restart.
+Pending: user installs v0.1.7 (adds Read-this-screen on top of v0.1.6) + git pull + phone restart.
 
 ## 🏆 Milestone: CALM MODE ON THE USER'S PHONE (2026-11-11)
 v0.1.4 installed (the "App not installed" blocker was fixed by
@@ -55,6 +55,14 @@ phone's main.py (fixed via git reset --hard origin/main).
   signature boxes. Risks S12/S13/I7 added to the risk map.
 - **2026-11-02 — Online document auto-fill** (both wizard + direct fill):
   paperwork wizard (merged) + autofill service (merged).
+- **2026-11-11 — "Can it read what's on the screen when I need it to?"**
+  (help understanding texts, emails, online documents): built "Read this
+  screen" — the system accessibility button now opens a simple chooser:
+  📖 Read this screen (big calm text + optional read-aloud, off by
+  default) or ✍️ Fill boxes (existing flow). Same safety rules: reads
+  only on the user's tap, never passwords, nothing stored/sent (S15).
+  Plain-language EXPLAINING ("what does this letter mean?") queued for
+  the on-device LLM (part 2). PR #23, v0.1.7.
 - **2026-11-11 — "No way to delete the last chat messages"** (found in
   real use): added a Clear chat button (trash icon beside "Too much",
   confirm dialog → wipes the encrypted history, greets fresh). PR #21,
