@@ -53,13 +53,21 @@ class ChatResponse(BaseModel):
     safety_flag: bool = False
 
 
+# Folder names for notes (user request 2026-11-11: "saved in a folder of
+# my choosing"). Friendly names only — letters, digits, spaces and a few
+# safe marks; empty means unfiled.
+FOLDER_PATTERN = re.compile(r"^[\w \-&',.]{0,60}$")
+
+
 class NoteIn(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
+    folder: str = Field(default="", max_length=60)
 
 
 class Note(BaseModel):
     id: int
     text: str
+    folder: str = ""
     created_at: str
 
 
@@ -107,8 +115,22 @@ def chat(req: ChatRequest):
 @app.post("/notes", response_model=Note, status_code=201,
           dependencies=[Depends(require_api_key)])
 def create_note(note: NoteIn):
+    folder = note.folder.strip()
+    if not FOLDER_PATTERN.match(folder):
+        raise HTTPException(
+            status_code=422,
+            detail="Folder names can use letters, numbers, spaces and - & ' , . only.",
+        )
     with closing(db.connect()) as conn:
-        return db.add_note(conn, note.text)
+        return db.add_note(conn, note.text, folder)
+
+
+@app.get("/notes/folders", response_model=list[str],
+         dependencies=[Depends(require_api_key)])
+def get_note_folders():
+    """Folder names in use — lets the app offer one-tap folder picks."""
+    with closing(db.connect()) as conn:
+        return db.list_note_folders(conn)
 
 
 @app.get("/notes", response_model=list[Note],

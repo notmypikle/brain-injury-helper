@@ -50,6 +50,9 @@ class ReadScreenActivity : ComponentActivity() {
                     var paused by remember { mutableStateOf(false) }
                     var currentIndex by remember { mutableIntStateOf(0) }
                     var notice by remember { mutableStateOf<String?>(null) }
+                    var showSaveDialog by remember { mutableStateOf(false) }
+                    var folderInput by remember { mutableStateOf("") }
+                    var knownFolders by remember { mutableStateOf<List<String>>(emptyList()) }
                     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
                     val listState = rememberLazyListState()
                     val scope = rememberCoroutineScope()
@@ -76,6 +79,23 @@ class ReadScreenActivity : ComponentActivity() {
                                 null,
                                 if (idx == chunks.size - 1) "sec-$i" else "part-$i-$idx",
                             )
+                        }
+                    }
+
+                    // User request (2026-11-11): "pause on a section and
+                    // save that section in a folder of my choosing."
+                    fun saveNote(textToSave: String) {
+                        val folder = folderInput.trim()
+                        scope.launch {
+                            try {
+                                api.addNote(textToSave, folder)
+                                notice = if (folder.isEmpty()) "Saved to your notes 📝"
+                                         else "Saved in $folder 📝"
+                                showSaveDialog = false
+                                folderInput = ""
+                            } catch (e: ApiClient.ApiException) {
+                                notice = e.message
+                            }
                         }
                     }
 
@@ -117,6 +137,50 @@ class ReadScreenActivity : ComponentActivity() {
                         if (speaking && sections.isNotEmpty()) {
                             listState.animateScrollToItem(currentIndex)
                         }
+                    }
+
+                    if (showSaveDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showSaveDialog = false },
+                            title = { Text("Save to notes") },
+                            text = {
+                                Column {
+                                    OutlinedTextField(
+                                        value = folderInput,
+                                        onValueChange = { folderInput = it },
+                                        label = { Text("Folder (optional)") },
+                                        placeholder = { Text("e.g. Health") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    if (knownFolders.isNotEmpty()) {
+                                        Spacer(Modifier.height(8.dp))
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            knownFolders.take(3).forEach { name ->
+                                                AssistChip(
+                                                    onClick = { folderInput = name },
+                                                    label = { Text(name) },
+                                                )
+                                            }
+                                        }
+                                    }
+                                    Spacer(Modifier.height(16.dp))
+                                    Button(
+                                        onClick = { saveNote(sections[currentIndex]) },
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) { Text("💾 Save this section") }
+                                    Spacer(Modifier.height(8.dp))
+                                    OutlinedButton(
+                                        onClick = { saveNote("Read from screen:\n$content") },
+                                        modifier = Modifier.fillMaxWidth(),
+                                    ) { Text("Save the whole screen") }
+                                }
+                            },
+                            confirmButton = {},
+                            dismissButton = {
+                                TextButton(onClick = { showSaveDialog = false }) { Text("Cancel") }
+                            },
+                        )
                     }
 
                     Column(Modifier.fillMaxSize().padding(16.dp)) {
@@ -192,13 +256,12 @@ class ReadScreenActivity : ComponentActivity() {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(
                                 onClick = {
+                                    showSaveDialog = true
+                                    // Folder chips are a convenience — the
+                                    // dialog works even if this fails.
                                     scope.launch {
-                                        try {
-                                            api.addNote("Read from screen:\n$content")
-                                            notice = "Saved to your notes 📝"
-                                        } catch (e: ApiClient.ApiException) {
-                                            notice = e.message
-                                        }
+                                        try { knownFolders = api.listNoteFolders() }
+                                        catch (e: ApiClient.ApiException) { }
                                     }
                                 },
                                 modifier = Modifier.weight(1f),
