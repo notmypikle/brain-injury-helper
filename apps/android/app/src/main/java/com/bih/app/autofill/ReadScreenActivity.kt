@@ -49,6 +49,11 @@ class ReadScreenActivity : ComponentActivity() {
                     var speaking by remember { mutableStateOf(false) }
                     var paused by remember { mutableStateOf(false) }
                     var currentIndex by remember { mutableIntStateOf(0) }
+                    // User feedback 2026-11-11: saving only one section at a
+                    // time was "very inconvenient" — select mode lets the
+                    // user tap several sections and save them together.
+                    var selectMode by remember { mutableStateOf(false) }
+                    val selected = remember { mutableStateListOf<Int>() }
                     var notice by remember { mutableStateOf<String?>(null) }
                     var showSaveDialog by remember { mutableStateOf(false) }
                     var folderInput by remember { mutableStateOf("") }
@@ -165,6 +170,18 @@ class ReadScreenActivity : ComponentActivity() {
                                         }
                                     }
                                     Spacer(Modifier.height(16.dp))
+                                    if (selected.isNotEmpty()) {
+                                        Button(
+                                            onClick = {
+                                                val picked = selected.sorted()
+                                                    .joinToString("\n") { sections[it] }
+                                                selected.clear(); selectMode = false
+                                                saveNote(picked)
+                                            },
+                                            modifier = Modifier.fillMaxWidth(),
+                                        ) { Text("💾 Save the selected sections") }
+                                        Spacer(Modifier.height(8.dp))
+                                    }
                                     Button(
                                         onClick = { saveNote(sections[currentIndex]) },
                                         modifier = Modifier.fillMaxWidth(),
@@ -199,13 +216,18 @@ class ReadScreenActivity : ComponentActivity() {
                                     shape = MaterialTheme.shapes.small,
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
                                         .clickable {
-                                            // Tap any paragraph to jump there.
-                                            currentIndex = i
-                                            if (speaking) speakSection(i)
+                                            if (selectMode) {
+                                                // Tap toggles selection.
+                                                if (i in selected) selected.remove(i) else selected.add(i)
+                                            } else {
+                                                // Tap any paragraph to jump there.
+                                                currentIndex = i
+                                                if (speaking) speakSection(i)
+                                            }
                                         },
                                 ) {
                                     Text(
-                                        section,
+                                        (if (selectMode && i in selected) "✔️ " else "") + section,
                                         style = if (isCurrent) MaterialTheme.typography.titleMedium
                                                 else MaterialTheme.typography.bodyLarge,
                                         modifier = Modifier.padding(8.dp),
@@ -254,6 +276,13 @@ class ReadScreenActivity : ComponentActivity() {
                         }
                         Spacer(Modifier.height(8.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = {
+                                    selectMode = !selectMode
+                                    if (!selectMode) selected.clear()
+                                },
+                                modifier = Modifier.weight(1f),
+                            ) { Text(if (selectMode) "Done selecting (${selected.size})" else "✔️ Select sections") }
                             OutlinedButton(
                                 onClick = {
                                     showSaveDialog = true
