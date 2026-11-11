@@ -1,5 +1,7 @@
 # The J.A.R.V.I.S. Map — B.I.H.'s North Star
 
+*"My phone is my suit of armor and helper in all ways." — the user, 2026-11-11*
+
 *The user's founding vision (2026-11-11): "I said to myself, if I had
 something like J.A.R.V.I.S. on my phone, things would be a whole lot
 easier to fill out forms and everything else. Keep in mind the high
