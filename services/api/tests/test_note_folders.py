@@ -65,3 +65,16 @@ def test_existing_db_without_folder_column_migrates(tmp_path, monkeypatch):
     assert notes[0]["text"] == "precious memory"  # nothing lost
     assert notes[0]["folder"] == ""  # column added with a safe default
     assert c.post("/notes", json={"text": "new", "folder": "Health"}).status_code == 201
+
+
+def test_whole_screen_capture_fits_in_a_note(client):
+    # Real use 2026-11-11: saving a full page hit the old 4000-char cap.
+    page = "Read from screen:\n" + ("A long document line. " * 400)  # ~8.8k chars
+    r = client.post("/notes", json={"text": page, "folder": "Health"})
+    assert r.status_code == 201
+    assert r.json()["text"] == page
+
+
+def test_notes_still_have_a_sane_limit(client):
+    r = client.post("/notes", json={"text": "x" * 10001})
+    assert r.status_code == 422
