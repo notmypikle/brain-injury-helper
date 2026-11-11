@@ -3,7 +3,15 @@
 *Where the project stands and what's next. Update this file at the end of
 every work session so the next session can pick up without re-discovery.*
 
-Last updated: 2026-11-10
+Last updated: 2026-11-11
+
+## 🏆 Milestone: CALM MODE ON THE USER'S PHONE (2026-11-11)
+v0.1.4 installed (the "App not installed" blocker was fixed by
+uninstalling the old app first — risk I8's documented workaround,
+confirmed working). User's verdict on the "Too much" button: "perfect".
+Pending: phone restart to reload the API with the new assistant brain
+(git pull done, uvicorn still runs the pre-pull code), then the phrase
+test ("remind me to drink water in 30 minutes" → should say "Done!").
 
 ## 🏆 Milestone: RUNNING ON THE USER'S PHONE (2026-11-10)
 The full stack is live on-device: app (APK from CI, via the `apk` branch
@@ -25,6 +33,7 @@ phone's main.py (fixed via git reset --hard origin/main).
 | Phase 2 — Android app | ✅ Coded | All screens, voice, notifications, autofill; pending first build + on-device test |
 | Phase 3 — voice, paperwork, export | 🔶 Mostly done | Voice (mic + TTS on Chat), paperwork wizard + export all built; needs on-device testing |
 | Phase 4 — encryption at rest, export/delete, local LLM | 🔶 Partial | `GET /export` + `DELETE /data` done; encryption at rest + local LLM pending |
+| Calm mode ("Too much" button) | ✅ On device | v0.1.4 installed 2026-11-11; user verified the Calm screen: "perfect" |
 
 ## User ideas log (things the user asked for — keep building on these)
 - **2026-11-02 — Cross-app integration + e-signature** (user's words: needs
