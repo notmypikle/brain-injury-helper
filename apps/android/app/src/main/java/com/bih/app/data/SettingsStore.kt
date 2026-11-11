@@ -37,8 +37,9 @@ class SettingsStore(context: Context) {
         private const val KEY_URL = "api_url"
         private const val KEY_KEY = "api_key"
         private const val KEY_PROFILE = "profile_cache"
-        // 10.0.2.2 is how the Android emulator reaches the host machine's
-        // localhost. On a real phone, use the computer's LAN address.
-        const val DEFAULT_URL = "http://10.0.2.2:8000"
+        // Default for the real setup (see docs/PHONE_SETUP.md): the API
+        // runs in Termux on the SAME phone, so loopback is correct.
+        // Emulator developers: use http://10.0.2.2:8000 instead.
+        const val DEFAULT_URL = "http://127.0.0.1:8000"
     }
 }
