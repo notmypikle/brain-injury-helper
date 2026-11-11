@@ -34,7 +34,7 @@ direct-download) + API in Termux (F-Droid build) + Termux:Boot auto-start
 boot; both Termux and Termux:Boot set to Battery → Unrestricted).
 Chat + spoken replies confirmed working end-to-end by the user.
 Gotchas encountered (all fixed/documented in docs/PHONE_SETUP.md):
-VPN blocking loopback (test with VPN off), sideload signature match
+VPN blocking loopback — SOLVED 2026-11-11: exclude the B.I.H. app in the VPN app's split-tunneling settings (B.I.H. only talks to 127.0.0.1, so bypassing the tunnel loses nothing); verified working with VPN ON, sideload signature match
 (Termux F-Droid ↔ Termux:Boot F-Droid), stray text once corrupted the
 phone's main.py (fixed via git reset --hard origin/main).
 
