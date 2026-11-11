@@ -40,6 +40,20 @@ class AssistMenuActivity : ComponentActivity() {
                             style = MaterialTheme.typography.titleLarge,
                         )
                         Spacer(Modifier.height(24.dp))
+                        // The read lens (user request 2026-11-11): drag a
+                        // small frame over ONE paragraph and read just that,
+                        // instead of copying the whole page.
+                        Button(
+                            onClick = {
+                                sendBroadcast(
+                                    Intent(BihAccessibilityService.ACTION_SHOW_LENS)
+                                        .setPackage(packageName),
+                                )
+                                finish()
+                            },
+                            modifier = Modifier.fillMaxWidth().height(64.dp),
+                        ) { Text("🔎 Read just part of the screen (lens)") }
+                        Spacer(Modifier.height(12.dp))
                         if (screenText.isNotBlank()) {
                             Button(
                                 onClick = {
