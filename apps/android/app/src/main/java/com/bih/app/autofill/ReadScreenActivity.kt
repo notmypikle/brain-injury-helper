@@ -33,6 +33,7 @@ class ReadScreenActivity : ComponentActivity() {
         if (text.isNullOrBlank()) {
             finish(); return
         }
+        val content: String = text
 
         setContent {
             BihTheme {
@@ -58,7 +59,7 @@ class ReadScreenActivity : ComponentActivity() {
                         // TTS accepts ~4000 chars per call — feed long
                         // screens in line-sized chunks.
                         val chunks = mutableListOf<String>()
-                        var rest = text
+                        var rest = content
                         while (rest.length > 3500) {
                             val cut = rest.lastIndexOf('\n', 3500).takeIf { it > 0 } ?: 3500
                             chunks.add(rest.take(cut))
@@ -82,7 +83,7 @@ class ReadScreenActivity : ComponentActivity() {
                         )
                         Spacer(Modifier.height(12.dp))
                         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                            Text(text, style = MaterialTheme.typography.titleMedium)
+                            Text(content, style = MaterialTheme.typography.titleMedium)
                         }
                         Spacer(Modifier.height(12.dp))
                         Button(

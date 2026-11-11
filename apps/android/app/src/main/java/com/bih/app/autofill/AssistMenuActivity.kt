@@ -44,7 +44,9 @@ class AssistMenuActivity : ComponentActivity() {
                             Button(
                                 onClick = {
                                     startActivity(
-                                        ReadScreenActivity.buildIntent(this, screenText),
+                                        ReadScreenActivity.buildIntent(
+                                            this@AssistMenuActivity, screenText,
+                                        ),
                                     )
                                     finish()
                                 },
@@ -57,7 +59,7 @@ class AssistMenuActivity : ComponentActivity() {
                                 onClick = {
                                     startActivity(
                                         ScreenFillConfirmationActivity.buildIntent(
-                                            this, labels, values, hasSubmit,
+                                            this@AssistMenuActivity, labels, values, hasSubmit,
                                         ),
                                     )
                                     finish()
